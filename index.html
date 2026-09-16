@@ -102,6 +102,12 @@
             transition: opacity 0.4s ease;
         }
         .temple-gate-overlay.is-open .tap-prompt-banner { opacity: 0; }
+        
+        /* Force hides indicator when view-again auto loop runs */
+        .tap-prompt-banner.hide-indicators {
+            display: none !important;
+            opacity: 0 !important;
+        }
 
         /* Animated Arrow Core pointing upward toward the gate center */
         .animated-arrow {
@@ -243,7 +249,7 @@
         <div class="gate-door-panel right">
             <img src="temple.png" alt="Temple Cover Right">
         </div>
-        <div class="tap-prompt-banner">
+        <div class="tap-prompt-banner" id="indicatorPromptGroup">
             <div class="animated-arrow">▲</div>
             <div class="tap-text-badge">TAP TO ENTER</div>
         </div>
@@ -294,6 +300,7 @@
     const gateOverlay = document.getElementById('templeGate');
     const audioTrack = document.getElementById('bgMusic');
     const playPauseBtn = document.getElementById('playPauseBtn');
+    const indicatorPromptGroup = document.getElementById('indicatorPromptGroup');
     
     let currentSlideIndex = 0;
     const totalSlidesCount = 3;
@@ -306,10 +313,16 @@
         if (sessionStorage.getItem('autoOpenTemple') === 'true') {
             sessionStorage.removeItem('autoOpenTemple'); // Clean state tracking
             
-            // 1. Immediately kick off audio track playback engine
+            // 1. Forcefully hide prompt text and animated arrows completely
+            if (indicatorPromptGroup) {
+                indicatorPromptGroup.classList.add('hide-indicators');
+            }
+            
+            // 2. Restart track playback explicitly from the very beginning timestamp
+            audioTrack.currentTime = 0;
             startAudioStream();
             
-            // 2. Lock doors shut for exactly 5 seconds, then fire the transition open
+            // 3. Lock doors shut for exactly 5 seconds, then fire the transition open automatically
             replayTimer = setTimeout(() => {
                 gateOverlay.classList.add('is-open');
                 startAutoTransitionLoop();
