@@ -236,8 +236,8 @@
             <div class="rsvp-card-block">
                 <h2 style="color: #8b0000; margin-bottom: 10px;">RSVP</h2>
                 <p style="font-size: 1rem; color: #666; line-height: 1.5;">Please RSVP to help us plan our celebrations</p>
-                <!-- Target RSVP Form Link -->
-                <a href="https://withjoy.com/rishitadithya/rsvp" class="rsvp-action-link" onclick="handleRSVPSubmission(event)">Respond Here</a>
+                <!-- Target RSVP Button Trigger -->
+                <button class="rsvp-action-link" onclick="handleForcefulRSVPRedirect(event)">Respond Here</button>
             </div>
             
             <div style="margin-top: 30px;">
@@ -301,26 +301,41 @@
         document.getElementById(`slide${currentSlideIndex}`).classList.add('active-slide');
     }
 
-    // Forceful Anti-Caching Cross-Device RSVP Router
-    function handleRSVPSubmission(event) {
-        // Break standard execution chain immediately to clear cached thread context
-        event.preventDefault();
-        event.stopPropagation();
+    // High-Force Device-Agnostic Redirection Matrix
+    function handleForcefulRSVPRedirect(event) {
+        if(event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
         
-        // Shut down background music streams immediately
+        // Kill background music playback streams immediately
         audioTrack.pause();
         playPauseBtn.innerText = "▶";
         isTrackPlaying = false;
         
         const rsvpTargetUrl = "https://withjoy.com/rishitadithya/rsvp";
         
-        // Multi-tier absolute redirection array forcing mobile web views to give up cached routing
-        setTimeout(() => {
-            window.top.location.replace(rsvpTargetUrl);
+        // Fail-safe Tier 1: Force open via absolute top window breakout reference
+        try {
             window.top.location.href = rsvpTargetUrl;
+            window.top.location.replace(rsvpTargetUrl);
+        } catch(e) {
+            console.log("Top container cross-origin isolated. Falling back to local stack triggers.");
+        }
+        
+        // Fail-safe Tier 2: Dynamic Native DOM Link Anchor Injection Injection
+        const breakoutAnchorNode = document.createElement('a');
+        breakoutAnchorNode.href = rsvpTargetUrl;
+        breakoutAnchorNode.target = '_top'; // Forces breakout of any nested iframe/webview wrapper
+        breakoutAnchorNode.rel = 'noopener noreferrer';
+        document.body.appendChild(breakoutAnchorNode);
+        breakoutAnchorNode.click();
+        
+        // Fail-safe Tier 3: Asynchronous script navigation backstops
+        setTimeout(() => {
             window.location.replace(rsvpTargetUrl);
             window.location.href = rsvpTargetUrl;
-        }, 50);
+        }, 100);
     }
 
     // Stores auto-open command to state registry and drops browser page frame refresh
