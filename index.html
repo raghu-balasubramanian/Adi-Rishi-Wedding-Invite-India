@@ -12,7 +12,7 @@
         }
         body {
             font-family: 'Georgia', serif;
-            background-color: #fcf9f2;
+            background-color: #f5eedc;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -21,7 +21,7 @@
             padding: 20px;
             -webkit-text-size-adjust: 100%;
         }
-        /* Mobile-First Main Frame Box */
+        /* Mobile-First Layout Frame */
         .slider-container {
             position: relative;
             width: 100%;
@@ -41,41 +41,59 @@
             height: auto;
             display: block;
         }
-        /* Standalone Embedded RSVP Page Slide */
+        /* Customized RSVP Screen Matching the Provided Image */
         .rsvp-slide-content {
-            background-color: #faf6ee;
-            padding: 60px 25px;
+            background-color: #f7ebd3; /* Warm cream background */
+            padding: 70px 25px;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 400px;
+            min-height: 450px;
         }
-        .rsvp-title {
-            color: #3d5a45;
-            font-size: 24px;
-            margin-bottom: 20px;
+        .rsvp-names {
+            color: #6a1b29; /* Maroon text style */
+            font-size: 32px;
+            font-style: italic;
             font-weight: bold;
+            margin-bottom: 35px;
         }
         .rsvp-link-btn {
             display: inline-block;
-            background-color: #bc903c;
+            background-color: #6a1b29; /* Deep maroon button */
             color: #ffffff;
             text-decoration: none;
-            padding: 15px 45px;
+            padding: 14px 55px;
             font-size: 18px;
+            font-style: italic;
             font-weight: bold;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             border-radius: 30px;
-            box-shadow: 0 6px 20px rgba(188, 144, 60, 0.3);
+            box-shadow: 0 4px 15px rgba(106, 27, 41, 0.2);
+            border: 1px solid #54121e;
             -webkit-appearance: none;
-            transition: background-color 0.2s ease;
+            margin-bottom: 35px;
         }
-        .rsvp-link-btn:hover {
-            background-color: #9e772f;
+        .rsvp-subtitle {
+            color: #4a3b2c;
+            font-size: 16px;
+            font-style: italic;
+            line-height: 1.5;
+            max-width: 280px;
+            margin-bottom: 50px;
         }
-        /* Navigation Controls Toolbar (Icons Only) */
+        .replay-link {
+            color: #5d4e3c;
+            font-size: 14px;
+            text-decoration: underline;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: 'Georgia', serif;
+            font-style: italic;
+        }
+        /* Navigation Controls Toolbar */
         .slider-controls {
             display: flex;
             justify-content: center;
@@ -84,6 +102,7 @@
             padding: 16px;
             background: #ffffff;
             border-top: 1px solid #f0e9dc;
+            transition: opacity 0.3s ease;
         }
         .control-btn {
             background-color: #3d5a45;
@@ -112,45 +131,49 @@
 </head>
 <body>
 
-    <!-- Audio Element -->
+    <!-- Target Audio File -->
     <audio id="bgMusic" src="music.mp3.mp4" loop preload="auto"></audio>
 
-    <!-- Main Display Frame Box -->
+    <!-- Main Container Box -->
     <div class="slider-container">
-        <!-- Slide 1: Temple Theme Cover -->
+        <!-- Slide 0: Temple Theme Cover -->
         <div class="slide-item">
             <img src="temple.png" alt="Traditional Temple Cover">
         </div>
         
-        <!-- Slide 2: Maapillai Azhaippu -->
+        <!-- Slide 1: Maapillai Azhaippu -->
         <div class="slide-item">
             <img src="maapillai.png" alt="Maapillai Azhaippu Event">
         </div>
 
-        <!-- Slide 3: Main Marriage Card -->
+        <!-- Slide 2: Main Marriage Card -->
         <div class="slide-item">
             <img src="marriage.png" alt="Main Wedding Card">
         </div>
 
-        <!-- Slide 4: Standalone RSVP Page -->
+        <!-- Slide 3: Styled RSVP Custom Screen -->
         <div class="slide-item">
             <div class="rsvp-slide-content">
-                <h2 class="rsvp-title">Kindly Respond by Celebrating With Us</h2>
-                <a href="https://withjoy.com" target="_blank" rel="noopener noreferrer" class="rsvp-link-btn">
-                    Click Here to RSVP
+                <h1 class="rsvp-names">Rishita & Adithya</h1>
+                
+                <a href="https://withjoy.com/rishitadithya/rsvp" target="_blank" rel="noopener noreferrer" class="rsvp-link-btn">
+                    RSVP
                 </a>
+                
+                <p class="rsvp-subtitle">Please RSVP to help us plan our celebrations</p>
+                
+                <button class="replay-link" onclick="restartSlideshow()">View Invitation Again</button>
             </div>
         </div>
 
-        <!-- Icons-Only Controls Layer -->
-        <div class="slider-controls">
+        <!-- Dynamic Controls Frame -->
+        <div class="slider-controls" id="controlsToolbar">
             <button class="control-btn" onclick="navigateSlides(-1)" aria-label="Backward">◀</button>
             <button class="control-btn" id="playPauseBtn" onclick="toggleAutoplay()" aria-label="Pause">⏸</button>
             <button class="control-btn" onclick="navigateSlides(1)" aria-label="Forward">▶</button>
         </div>
     </div>
 
-    <!-- Music Fade Controller Engine -->
     <script>
         let currentSlide = 0;
         let autoplayTimer;
@@ -160,31 +183,37 @@
 
         const allSlides = document.getElementsByClassName("slide-item");
         const playPauseButton = document.getElementById("playPauseBtn");
+        const controlsToolbar = document.getElementById("controlsToolbar");
         const music = document.getElementById("bgMusic");
 
         function renderSlide() {
             if (allSlides.length === 0) return;
             
-            // Clean loop control boundaries
+            // Boundary loops
             if (currentSlide >= allSlides.length) { currentSlide = 0; }
             if (currentSlide < 0) { currentSlide = allSlides.length - 1; }
 
-            // Hide inactive windows
+            // Hide all views
             for (let i = 0; i < allSlides.length; i++) {
                 allSlides[i].style.display = "none";  
             }
             
-            // Render target view screen
+            // Render view screen
             allSlides[currentSlide].style.display = "block";  
 
-            // Manage Music Timer for the RSVP Slide (Slide Index 3)
+            // Requirement 1: Hide control toolbar completely on the Temple page (Index 0)
+            if (currentSlide === 0) {
+                controlsToolbar.style.display = "none";
+            } else {
+                controlsToolbar.style.display = "flex";
+            }
+
+            // Handle music behavior on RSVP page (Index 3)
             clearTimeout(musicTimeout);
             if (currentSlide === 3) {
-                // Trigger 5 second tracking sequence
                 musicTimeout = setTimeout(function() {
                     if (music && !music.paused) {
                         music.pause();
-                        // Turn play icon indicator off to stay visually synchronous
                         isAutoplayActive = false;
                         clearAutoplay();
                         playPauseButton.innerHTML = "▶";
@@ -224,21 +253,33 @@
                 isAutoplayActive = false;
             } else {
                 kickstartAudio();
-                currentSlide++;
-                renderSlide();
+                // Requirement 2: Resumes playing exactly where it was paused (does not force skip a slide)
+                renderSlide(); 
                 startAutoplay();
                 playPauseButton.innerHTML = "⏸";
                 isAutoplayActive = true;
             }
         }
 
-        function kickstartAudio() {
-            if (music && music.paused && isAutoplayActive && currentSlide !== 3) {
-                music.play().catch(err => console.log("Awaiting activation tap."));
+        function restartSlideshow() {
+            clearAutoplay();
+            currentSlide = 0;
+            isAutoplayActive = true;
+            playPauseButton.innerHTML = "⏸";
+            renderSlide();
+            startAutoplay();
+            if (music) {
+                music.currentTime = 0;
+                music.play().catch(err => console.log("Audio reset waiting for interaction."));
             }
         }
 
-        // Mobile unlock handling
+        function kickstartAudio() {
+            if (music && music.paused && isAutoplayActive && currentSlide !== 3) {
+                music.play().catch(err => console.log("Awaiting interactive tap event."));
+            }
+        }
+
         document.addEventListener('touchstart', kickstartAudio, { once: true });
         document.addEventListener('click', kickstartAudio, { once: true });
 
