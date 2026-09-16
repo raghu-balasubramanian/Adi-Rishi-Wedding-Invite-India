@@ -299,19 +299,30 @@
     const totalSlidesCount = 3;
     let isTrackPlaying = false;
     let autoTransitionTimer = null;
+    let replayTimer = null;
 
     // Checks local session memory state to determine if gate should auto-open on load
     window.addEventListener('DOMContentLoaded', () => {
         if (sessionStorage.getItem('autoOpenTemple') === 'true') {
             sessionStorage.removeItem('autoOpenTemple'); // Clean state tracking
-            gateOverlay.classList.add('is-open');
+            
+            // 1. Immediately kick off audio track playback engine
             startAudioStream();
-            startAutoTransitionLoop();
+            
+            // 2. Lock doors shut for exactly 5 seconds, then fire the transition open
+            replayTimer = setTimeout(() => {
+                gateOverlay.classList.add('is-open');
+                startAutoTransitionLoop();
+            }, 5000);
         }
     });
 
-    // Opens curtain panels gracefully on guest click engagement
+    // Opens curtain panels gracefully on manual guest click engagement
     function executeGateOpening() {
+        if (replayTimer !== null) {
+            clearTimeout(replayTimer);
+            replayTimer = null;
+        }
         gateOverlay.classList.add('is-open');
         if (!isTrackPlaying) {
             startAudioStream();
@@ -321,12 +332,10 @@
 
     // Core Presentation Slide Navigation Engine
     function navigateSlide(direction) {
-        // Strip visibility formatting across all panels to avoid layout caching collisions
         for (let i = 0; i < totalSlidesCount; i++) {
             document.getElementById(`slide${i}`).classList.remove('active-slide');
         }
         
-        // Calculate new destination index safely
         currentSlideIndex = currentSlideIndex + direction;
         
         if (currentSlideIndex >= totalSlidesCount) {
@@ -335,7 +344,6 @@
             currentSlideIndex = totalSlidesCount - 1;
         }
         
-        // Enforce visibility constraint strictly on the target layout node
         document.getElementById(`slide${currentSlideIndex}`).classList.add('active-slide');
     }
 
@@ -349,8 +357,8 @@
     function startAutoTransitionLoop() {
         if (autoTransitionTimer === null) {
             autoTransitionTimer = setInterval(() => {
-                navigateSlide(1); // Advance forward automatically
-            }, 20000); // 20000 milliseconds = 20 seconds
+                navigateSlide(1); 
+            }, 20000); // 20 seconds for standard card rotation loop
         }
     }
 
@@ -370,35 +378,27 @@
             event.stopPropagation();
         }
         
-        // Stop the slideshow loop completely
-        if (autoTransitionTimer !== null) {
-            clearInterval(autoTransitionTimer);
-        }
+        if (autoTransitionTimer !== null) clearInterval(autoTransitionTimer);
+        if (replayTimer !== null) clearTimeout(replayTimer);
         
-        // Kill background music playback streams immediately
         audioTrack.pause();
         playPauseBtn.innerText = "▶";
         isTrackPlaying = false;
         
         const rsvpTargetUrl = "https://withjoy.com";
         
-        // Fail-safe Tier 1: Force open via absolute top window breakout reference
         try {
             window.top.location.href = rsvpTargetUrl;
             window.top.location.replace(rsvpTargetUrl);
-        } catch(e) {
-            console.log("Top container cross-origin isolated. Falling back to local stack triggers.");
-        }
+        } catch(e) {}
         
-        // Fail-safe Tier 2: Dynamic Native DOM Link Anchor Injection
         const breakoutAnchorNode = document.createElement('a');
         breakoutAnchorNode.href = rsvpTargetUrl;
-        breakoutAnchorNode.target = '_top'; // Forces breakout of any nested iframe/webview wrapper
+        breakoutAnchorNode.target = '_top'; 
         breakoutAnchorNode.rel = 'noopener noreferrer';
         document.body.appendChild(breakoutAnchorNode);
         breakoutAnchorNode.click();
         
-        // Fail-safe Tier 3: Asynchronous script navigation backstops
         setTimeout(() => {
             window.location.replace(rsvpTargetUrl);
             window.location.href = rsvpTargetUrl;
@@ -407,9 +407,9 @@
 
     // Stores auto-open command to state registry and drops browser page frame refresh
     function triggerAutoOpenReset() {
-        if (autoTransitionTimer !== null) {
-            clearInterval(autoTransitionTimer);
-        }
+        if (autoTransitionTimer !== null) clearInterval(autoTransitionTimer);
+        if (replayTimer !== null) clearTimeout(replayTimer);
+        
         sessionStorage.setItem('autoOpenTemple', 'true');
         window.location.reload();
     }
@@ -425,6 +425,12 @@
     }
 
     function toggleAudioPlayback() {
+        if (replayTimer !== null) {
+            clearTimeout(replayTimer);
+            replayTimer = null;
+            gateOverlay.classList.add('is-open');
+            startAutoTransitionLoop();
+        }
         if (isTrackPlaying) {
             audioTrack.pause();
             playPauseBtn.innerText = "▶";
