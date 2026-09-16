@@ -21,7 +21,7 @@
             padding: 20px;
             -webkit-text-size-adjust: 100%;
         }
-        /* Mobile-First Layout Frame */
+        /* Mobile-First Main Frame Box */
         .slider-container {
             position: relative;
             width: 100%;
@@ -41,12 +41,46 @@
             height: auto;
             display: block;
         }
-        /* Navigation Controls Toolbar */
+        /* Standalone Embedded RSVP Page Slide */
+        .rsvp-slide-content {
+            background-color: #faf6ee;
+            padding: 60px 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+        .rsvp-title {
+            color: #3d5a45;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .rsvp-link-btn {
+            display: inline-block;
+            background-color: #bc903c;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 15px 45px;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            border-radius: 30px;
+            box-shadow: 0 6px 20px rgba(188, 144, 60, 0.3);
+            -webkit-appearance: none;
+            transition: background-color 0.2s ease;
+        }
+        .rsvp-link-btn:hover {
+            background-color: #9e772f;
+        }
+        /* Navigation Controls Toolbar (Icons Only) */
         .slider-controls {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px;
+            gap: 25px;
             padding: 16px;
             background: #ffffff;
             border-top: 1px solid #f0e9dc;
@@ -55,41 +89,20 @@
             background-color: #3d5a45;
             color: #ffffff;
             border: none;
-            padding: 12px 20px;
-            font-size: 15px;
+            padding: 12px;
+            font-size: 18px;
             font-weight: bold;
-            border-radius: 25px;
+            border-radius: 50%;
             cursor: pointer;
-            min-width: 95px;
-            text-align: center;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             -webkit-appearance: none;
         }
         .control-btn:hover {
             background-color: #2b3f30;
-        }
-        /* RSVP Link Area */
-        .rsvp-footer {
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-            margin-top: 24px;
-        }
-        .rsvp-link-btn {
-            display: inline-block;
-            background-color: #bc903c;
-            color: #ffffff;
-            text-decoration: none;
-            padding: 14px 45px;
-            font-size: 18px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-            border-radius: 30px;
-            box-shadow: 0 6px 20px rgba(188, 144, 60, 0.3);
-            -webkit-appearance: none;
-            width: 100%;
-        }
-        .rsvp-link-btn:hover {
-            background-color: #9e772f;
         }
         @keyframes fadeIn {
             from { opacity: 0.5; }
@@ -99,10 +112,10 @@
 </head>
 <body>
 
-    <!-- Target Audio File (Matches your music.mp3.mp4 exactly) -->
+    <!-- Audio Element -->
     <audio id="bgMusic" src="music.mp3.mp4" loop preload="auto"></audio>
 
-    <!-- Main Card Display Frame -->
+    <!-- Main Display Frame Box -->
     <div class="slider-container">
         <!-- Slide 1: Temple Theme Cover -->
         <div class="slide-item">
@@ -114,29 +127,34 @@
             <img src="maapillai.png" alt="Maapillai Azhaippu Event">
         </div>
 
-        <!-- Slide 3: Main Wedding Marriage Card -->
+        <!-- Slide 3: Main Marriage Card -->
         <div class="slide-item">
             <img src="marriage.png" alt="Main Wedding Card">
         </div>
 
-        <!-- Toolbar Back/Pause/Forward Controls -->
+        <!-- Slide 4: Standalone RSVP Page -->
+        <div class="slide-item">
+            <div class="rsvp-slide-content">
+                <h2 class="rsvp-title">Kindly Respond by Celebrating With Us</h2>
+                <a href="https://withjoy.com" target="_blank" rel="noopener noreferrer" class="rsvp-link-btn">
+                    Click Here to RSVP
+                </a>
+            </div>
+        </div>
+
+        <!-- Icons-Only Controls Layer -->
         <div class="slider-controls">
-            <button class="control-btn" onclick="navigateSlides(-1)">◀ Back</button>
-            <button class="control-btn" id="playPauseBtn" onclick="toggleAutoplay()">Locate ⏸</button>
-            <button class="control-btn" onclick="navigateSlides(1)">Next ▶</button>
+            <button class="control-btn" onclick="navigateSlides(-1)" aria-label="Backward">◀</button>
+            <button class="control-btn" id="playPauseBtn" onclick="toggleAutoplay()" aria-label="Pause">⏸</button>
+            <button class="control-btn" onclick="navigateSlides(1)" aria-label="Forward">▶</button>
         </div>
     </div>
 
-    <!-- RSVP Anchor Link Section -->
-    <div class="rsvp-footer">
-        <a href="https://withjoy.com" target="_blank" rel="noopener noreferrer" class="rsvp-link-btn" onclick="kickstartAudio()">
-            Click Here to RSVP
-        </a>
-    </div>
-
+    <!-- Music Fade Controller Engine -->
     <script>
         let currentSlide = 0;
         let autoplayTimer;
+        let musicTimeout;
         let isAutoplayActive = true;
         const slideDuration = 4000; 
 
@@ -146,13 +164,33 @@
 
         function renderSlide() {
             if (allSlides.length === 0) return;
+            
+            // Clean loop control boundaries
             if (currentSlide >= allSlides.length) { currentSlide = 0; }
             if (currentSlide < 0) { currentSlide = allSlides.length - 1; }
 
+            // Hide inactive windows
             for (let i = 0; i < allSlides.length; i++) {
                 allSlides[i].style.display = "none";  
             }
+            
+            // Render target view screen
             allSlides[currentSlide].style.display = "block";  
+
+            // Manage Music Timer for the RSVP Slide (Slide Index 3)
+            clearTimeout(musicTimeout);
+            if (currentSlide === 3) {
+                // Trigger 5 second tracking sequence
+                musicTimeout = setTimeout(function() {
+                    if (music && !music.paused) {
+                        music.pause();
+                        // Turn play icon indicator off to stay visually synchronous
+                        isAutoplayActive = false;
+                        clearAutoplay();
+                        playPauseButton.innerHTML = "▶";
+                    }
+                }, 5000);
+            }
         }
 
         function triggerNextSlide() {
@@ -182,25 +220,25 @@
             if (isAutoplayActive) {
                 clearAutoplay();
                 music.pause();
-                playPauseButton.innerHTML = "▶ Play";
+                playPauseButton.innerHTML = "▶";
                 isAutoplayActive = false;
             } else {
                 kickstartAudio();
                 currentSlide++;
                 renderSlide();
                 startAutoplay();
-                playPauseButton.innerHTML = "⏸ Pause";
+                playPauseButton.innerHTML = "⏸";
                 isAutoplayActive = true;
             }
         }
 
         function kickstartAudio() {
-            if (music && music.paused && isAutoplayActive) {
-                music.play().catch(err => console.log("Awaiting user click gesture to bypass iOS block"));
+            if (music && music.paused && isAutoplayActive && currentSlide !== 3) {
+                music.play().catch(err => console.log("Awaiting activation tap."));
             }
         }
 
-        // Event hooks for mobile to clear restrictions instantly on gesture tap
+        // Mobile unlock handling
         document.addEventListener('touchstart', kickstartAudio, { once: true });
         document.addEventListener('click', kickstartAudio, { once: true });
 
