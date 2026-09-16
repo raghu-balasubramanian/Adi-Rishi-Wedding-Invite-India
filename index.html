@@ -156,7 +156,7 @@
             <div class="rsvp-slide-content">
                 <h1 class="rsvp-names">Rishita & Adithya</h1>
                 
-                <a href="https://withjoy.com/rishitadithya/rsvp" target="_blank" rel="noopener noreferrer" class="rsvp-link-btn">
+                <a href="https://withjoy.com" target="_blank" rel="noopener noreferrer" class="rsvp-link-btn">
                     RSVP
                 </a>
                 
@@ -198,24 +198,24 @@
                 allSlides[i].style.display = "none";  
             }
             
-            // Render view screen
+            // Render active view screen
             allSlides[currentSlide].style.display = "block";  
 
-            // Requirement 1: Hide control toolbar completely on the Temple page (Index 0)
-            if (currentSlide === 0) {
+            // Hide control toolbar completely on BOTH Temple (Index 0) and RSVP (Index 3) pages
+            if (currentSlide === 0 || currentSlide === 3) {
                 controlsToolbar.style.display = "none";
             } else {
                 controlsToolbar.style.display = "flex";
             }
 
-            // Handle music behavior on RSVP page (Index 3)
+            // Stop the music and completely kill the auto-loop once it hits the RSVP page
             clearTimeout(musicTimeout);
             if (currentSlide === 3) {
+                clearAutoplay(); // Freezes page layout right here
+                
                 musicTimeout = setTimeout(function() {
                     if (music && !music.paused) {
                         music.pause();
-                        isAutoplayActive = false;
-                        clearAutoplay();
                         playPauseButton.innerHTML = "▶";
                     }
                 }, 5000);
@@ -240,7 +240,7 @@
             kickstartAudio();
             currentSlide += direction;
             renderSlide();
-            if (isAutoplayActive) {
+            if (isAutoplayActive && currentSlide !== 3) {
                 startAutoplay();
             }
         }
@@ -248,16 +248,19 @@
         function toggleAutoplay() {
             if (isAutoplayActive) {
                 clearAutoplay();
-                music.pause();
+                if (music) music.pause();
                 playPauseButton.innerHTML = "▶";
                 isAutoplayActive = false;
             } else {
-                kickstartAudio();
-                // Requirement 2: Resumes playing exactly where it was paused (does not force skip a slide)
-                renderSlide(); 
-                startAutoplay();
-                playPauseButton.innerHTML = "⏸";
                 isAutoplayActive = true;
+                playPauseButton.innerHTML = "⏸";
+                if (music && currentSlide !== 3) {
+                    music.play().catch(err => console.log("Music play failed or blocked"));
+                }
+                renderSlide(); 
+                if (currentSlide !== 3) {
+                    startAutoplay();
+                }
             }
         }
 
