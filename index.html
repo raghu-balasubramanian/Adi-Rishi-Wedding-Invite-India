@@ -103,43 +103,46 @@
             font-style: italic;
         }
 
-        /* OPAQUE FLOATING CONTROLS OVERLAY */
+        /* SEMI-TRANSPARENT FLOATING BUTTONS OVERLAY */
         .slider-controls {
             position: absolute;
-            bottom: 25px; 
+            bottom: 30px; 
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 25px;
+            gap: 30px;
             z-index: 100;
-            background: #ffffff; /* Completely 100% solid white opaque backdrop */
-            padding: 10px 20px;
-            border-radius: 40px;
-            border: 1px solid #e2d9c5;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); /* Soft drop shadow to make it pop neatly */
+            background: transparent; /* Removed solid white backdrop panel */
+            padding: 0;
+            border: none;
             transition: opacity 0.3s ease;
         }
         .control-btn {
-            background-color: #3d5a45; /* Clean sage green layout color */
-            color: #ffffff;
-            border: none;
+            /* 70% Semi-transparent background lets your text/images show cleanly underneath */
+            background-color: rgba(61, 90, 69, 0.3); 
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 10px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 50%;
             cursor: pointer;
-            width: 44px;
-            height: 44px;
+            width: 46px;
+            height: 46px;
             display: flex;
             align-items: center;
             justify-content: center;
             -webkit-appearance: none;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            backdrop-filter: blur(3px); /* Gentle blur softens the underlying background pixels */
+            -webkit-backdrop-filter: blur(3px);
+            transition: background-color 0.2s ease, transform 0.1s ease;
         }
-        .control-btn:hover {
-            background-color: #2b3f30;
+        .control-btn:active {
+            transform: scale(0.95);
+            background-color: rgba(61, 90, 69, 0.6);
         }
         @keyframes fadeIn {
             from { opacity: 0.5; }
@@ -176,11 +179,12 @@
             <div class="rsvp-slide-content">
                 <h1 class="rsvp-names">Rishita & Adithya</h1>
                 
-                <a href="https://withjoy.com" 
+                <!-- Hardcoded RSVP Tracking Anchor Link Configuration -->
+                <a href="https://withjoy.com/rishitadithya/rsvp?utm_medium=web&utm_source=guest_site_nav&utm_campaign=nav_menu_rsvp" 
                    target="_blank" 
                    rel="noopener noreferrer" 
                    class="rsvp-link-btn" 
-                   onclick="window.open('https://withjoy.com', '_blank'); return false;">
+                   onclick="window.open('https://withjoy.com/rishitadithya/rsvp?utm_medium=web&utm_source=guest_site_nav&utm_campaign=nav_menu_rsvp', '_blank'); return false;">
                     RSVP
                 </a>
                 
