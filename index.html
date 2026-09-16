@@ -31,7 +31,6 @@
             border-radius: 16px;
             overflow: hidden;
         }
-        /* Forces clean rendering rules on iPhone */
         .slide-item {
             display: none;
             width: 100%;
@@ -42,7 +41,7 @@
             height: auto;
             display: block;
         }
-        /* Audio and Navigation Control Dashboard */
+        /* Navigation Controls Toolbar */
         .slider-controls {
             display: flex;
             justify-content: center;
@@ -56,14 +55,14 @@
             background-color: #3d5a45;
             color: #ffffff;
             border: none;
-            padding: 10px 18px;
-            font-size: 14px;
+            padding: 12px 20px;
+            font-size: 15px;
             font-weight: bold;
             border-radius: 25px;
             cursor: pointer;
-            min-width: 90px;
+            min-width: 95px;
             text-align: center;
-            -webkit-appearance: none; /* Disables default iOS styling override */
+            -webkit-appearance: none;
         }
         .control-btn:hover {
             background-color: #2b3f30;
@@ -87,51 +86,54 @@
             border-radius: 30px;
             box-shadow: 0 6px 20px rgba(188, 144, 60, 0.3);
             -webkit-appearance: none;
+            width: 100%;
+        }
+        .rsvp-link-btn:hover {
+            background-color: #9e772f;
         }
         @keyframes fadeIn {
-            from { opacity: 0.4; }
+            from { opacity: 0.5; }
             to { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <!-- HTML5 Audio Core (Add your music filename here) -->
-    <audio id="bgMusic" src="./wedding_music.mp3" loop preload="auto"></audio>
+    <!-- Target Audio File (Matches your music.mp3.mp4 exactly) -->
+    <audio id="bgMusic" src="music.mp3.mp4" loop preload="auto"></audio>
 
     <!-- Main Card Display Frame -->
     <div class="slider-container">
-        <!-- Card 1: Traditional Temple Cover -->
+        <!-- Slide 1: Temple Theme Cover -->
         <div class="slide-item">
-            <img src="./image_w6JIXe.png" alt="Traditional Temple Cover">
+            <img src="temple.png" alt="Traditional Temple Cover">
         </div>
         
-        <!-- Card 2: Maapillai Azhaippu (Haldi/Event) -->
+        <!-- Slide 2: Maapillai Azhaippu -->
         <div class="slide-item">
-            <img src="./image_Vp6zYa.png" alt="Maapillai Azhaippu Event">
+            <img src="maapillai.png" alt="Maapillai Azhaippu Event">
         </div>
 
-        <!-- Card 3: Main Wedding Muhurtham -->
+        <!-- Slide 3: Main Wedding Marriage Card -->
         <div class="slide-item">
-            <img src="./image_U3jU8C.png" alt="Main Wedding Card">
+            <img src="marriage.png" alt="Main Wedding Card">
         </div>
 
-        <!-- Navigation Controls Toolbar -->
+        <!-- Toolbar Back/Pause/Forward Controls -->
         <div class="slider-controls">
             <button class="control-btn" onclick="navigateSlides(-1)">◀ Back</button>
-            <button class="control-btn" id="playPauseBtn" onclick="toggleAutoplay()">⏸ Pause</button>
+            <button class="control-btn" id="playPauseBtn" onclick="toggleAutoplay()">Locate ⏸</button>
             <button class="control-btn" onclick="navigateSlides(1)">Next ▶</button>
         </div>
     </div>
 
-    <!-- RSVP Redirect Section -->
+    <!-- RSVP Anchor Link Section -->
     <div class="rsvp-footer">
         <a href="https://withjoy.com" target="_blank" rel="noopener noreferrer" class="rsvp-link-btn" onclick="kickstartAudio()">
             Click Here to RSVP
         </a>
     </div>
 
-    <!-- Slider & iOS Audio Engine Optimization -->
     <script>
         let currentSlide = 0;
         let autoplayTimer;
@@ -142,18 +144,14 @@
         const playPauseButton = document.getElementById("playPauseBtn");
         const music = document.getElementById("bgMusic");
 
-        // Safe Rendering Engine for iOS Safari
         function renderSlide() {
             if (allSlides.length === 0) return;
-
-            // Handle boundaries cleanly without crashing execution
             if (currentSlide >= allSlides.length) { currentSlide = 0; }
             if (currentSlide < 0) { currentSlide = allSlides.length - 1; }
 
             for (let i = 0; i < allSlides.length; i++) {
                 allSlides[i].style.display = "none";  
             }
-            
             allSlides[currentSlide].style.display = "block";  
         }
 
@@ -172,7 +170,7 @@
 
         function navigateSlides(direction) {
             clearAutoplay();
-            kickstartAudio(); // Unlock audio on manual click
+            kickstartAudio();
             currentSlide += direction;
             renderSlide();
             if (isAutoplayActive) {
@@ -196,24 +194,20 @@
             }
         }
 
-        // Bypasses iOS Autoplay Restrictions on first user interaction
         function kickstartAudio() {
             if (music && music.paused && isAutoplayActive) {
-                music.play().catch(function(error) {
-                    console.log("Audio kickstart caught: ", error);
-                });
+                music.play().catch(err => console.log("Awaiting user click gesture to bypass iOS block"));
             }
         }
 
-        // Global touch unlock for iPhone user profiles
+        // Event hooks for mobile to clear restrictions instantly on gesture tap
         document.addEventListener('touchstart', kickstartAudio, { once: true });
         document.addEventListener('click', kickstartAudio, { once: true });
 
-        // Force initial initialization
-        document.addEventListener("DOMContentLoaded", function() {
+        window.onload = function() {
             renderSlide();
             startAutoplay();
-        });
+        };
     </script>
 
 </body>
