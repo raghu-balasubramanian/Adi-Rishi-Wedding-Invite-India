@@ -49,6 +49,40 @@
             position: relative;
         }
 
+        /* ANIMATED ARROW & KNOCKING INDICATOR */
+        .knocking-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none; /* Allows the click to pass directly into the wrapper container */
+            z-index: 50;
+        }
+        /* Arrow moving towards the door layout */
+        .animated-arrow {
+            font-size: 40px;
+            color: #bc903c;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            animation: moveAndKnock 2s infinite ease-in-out;
+        }
+        /* Hint text to invite action */
+        .click-hint {
+            background: rgba(106, 27, 41, 0.85);
+            color: #ffffff;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-style: italic;
+            border-radius: 20px;
+            margin-top: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            letter-spacing: 0.5px;
+            animation: hintPulse 2s infinite ease-in-out;
+        }
+
         /* Customized RSVP Screen Matching the Provided Image */
         .rsvp-slide-content {
             background-color: #f7ebd3; /* Warm cream background */
@@ -143,6 +177,22 @@
             transform: scale(0.95);
             background-color: rgba(61, 90, 69, 0.6);
         }
+
+        /* ANIMATION KEYFRAMES DESCRIPTION */
+        @keyframes moveAndKnock {
+            0% { transform: translateY(15px) scale(1); opacity: 0.8; }
+            40% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+            /* Rhythmic double-pulse knock effect hitting the screen door destination */
+            50% { transform: translateY(-12px) scale(0.95); }
+            60% { transform: translateY(-8px) scale(1.05); }
+            70% { transform: translateY(-12px) scale(0.95); }
+            80% { transform: translateY(-10px) scale(1); opacity: 1; }
+            100% { transform: translateY(15px) scale(1); opacity: 0.8; }
+        }
+        @keyframes hintPulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.04); opacity: 1; }
+        }
         @keyframes fadeIn {
             from { opacity: 0.5; }
             to { opacity: 1; }
@@ -156,9 +206,13 @@
 
     <!-- Main Container Box -->
     <div class="slider-container">
-        <!-- Slide 0: Temple Theme Cover -->
+        <!-- Slide 0: Temple Theme Cover with Knocking Arrow Indicators -->
         <div class="slide-item">
             <div class="temple-click-wrapper" onclick="startOnTempleClick()">
+                <div class="knocking-indicator" id="knockingContainer">
+                    <div class="animated-arrow">▲</div>
+                    <div class="click-hint">Tap to Enter</div>
+                </div>
                 <img src="temple.png" alt="Traditional Temple Cover">
             </div>
         </div>
@@ -178,7 +232,6 @@
             <div class="rsvp-slide-content">
                 <h1 class="rsvp-names">Rishita & Adithya</h1>
                 
-                <!-- Hardcoded RSVP Tracking Anchor Link Configuration -->
                 <a href="https://withjoy.com" 
                    target="_blank" 
                    rel="noopener noreferrer" 
@@ -205,12 +258,13 @@
         let autoplayTimer;
         let fadeInterval;
         let isAutoplayActive = true;
-        let isFirstLaunch = true; /* Lock initial Temple screen behavior */
+        let isFirstLaunch = true; /* Tracks initial launch to lock playback state */
         const slideDuration = 4000; 
 
         const allSlides = document.getElementsByClassName("slide-item");
         const playPauseButton = document.getElementById("playPauseBtn");
         const controlsToolbar = document.getElementById("controlsToolbar");
+        const knockingContainer = document.getElementById("knockingContainer");
         const music = document.getElementById("bgMusic");
 
         function renderSlide() {
@@ -225,29 +279,29 @@
             
             allSlides[currentSlide].style.display = "block";  
 
-            /* Hide toolbar on Temple (0) and RSVP (3) */
+            /* Hide navigation bar overlay on Temple (0) and RSVP (3) screens */
             if (currentSlide === 0 || currentSlide === 3) {
                 controlsToolbar.style.display = "none";
             } else {
                 controlsToolbar.style.display = "flex";
             }
 
-            /* Smooth audio fade-out over 5 seconds on the RSVP page */
+            /* Manage smooth audio linear fade operations upon hitting RSVP page */
             clearInterval(fadeInterval);
             if (currentSlide === 3) {
                 clearAutoplay(); 
-                fadeOutAudio(5000); // 5000 milliseconds = 5 seconds total fade time
+                fadeOutAudio(5000); // Fades volume down step-by-step over 5 seconds
             }
         }
 
-        /* Smooth linear fade audio utility engine */
+        /* Volume lowering calculation engine */
         function fadeOutAudio(duration) {
             if (!music || music.paused) return;
             
             const startVolume = 1.0;
             music.volume = startVolume;
             
-            const fadeSteps = 50; // Updates volume every 100ms over 5 seconds
+            const fadeSteps = 50; 
             const stepTime = duration / fadeSteps;
             const volumeDecreasePerStep = startVolume / fadeSteps;
             
@@ -260,7 +314,7 @@
                 if (newVolume <= 0) {
                     clearInterval(fadeInterval);
                     music.pause();
-                    music.volume = 1.0; // Reset internal track volume ceiling back to max for replay use
+                    music.volume = 1.0; // Reset ceiling back to max for flawless subsequent loops
                     playPauseButton.innerHTML = "▶";
                 } else {
                     music.volume = newVolume;
@@ -268,7 +322,7 @@
             }, stepTime);
         }
 
-        /* Triggered when tapping anywhere on Temple Card Cover */
+        /* Triggered when user explicitly taps anywhere inside Temple Card layout */
         function startOnTempleClick() {
             if (isFirstLaunch) {
                 isFirstLaunch = false;
@@ -299,7 +353,7 @@
         function navigateSlides(direction) {
             clearAutoplay();
             clearInterval(fadeInterval);
-            if (music) music.volume = 1.0; // Instantly restore full volume during manually forced steps
+            if (music) music.volume = 1.0; // Restore full audio volume during forced interaction steps
             kickstartAudio();
             currentSlide += direction;
             renderSlide();
@@ -320,7 +374,7 @@
                 playPauseButton.innerHTML = "⏸";
                 if (music) music.volume = 1.0;
                 if (music && currentSlide !== 3) {
-                    music.play().catch(err => console.log("Audio resume caught"));
+                    music.play().catch(err => console.log("Audio pipeline catch"));
                 }
                 renderSlide(); 
                 if (currentSlide !== 3) {
@@ -329,24 +383,37 @@
             }
         }
 
+        /* REPLAY ENGINE: Sets up instant automatic playback bypassing initial click constraints */
         function restartSlideshow() {
             clearAutoplay();
             clearInterval(fadeInterval);
-            currentSlide = 0;
-            isFirstLaunch = true; /* Reset lock until clicked */
+            
+            // Bypass initial template gesture blocks for seamless immediate playback loop
+            isFirstLaunch = false; 
             isAutoplayActive = true;
             playPauseButton.innerHTML = "⏸";
+            
+            // Hide the animated arrow indicator since it is auto-advancing
+            if (knockingContainer) knockingContainer.style.display = "none";
+            
+            // Jump back to the temple cover slide view
+            currentSlide = 0;
             renderSlide();
+            
+            // Re-fire music track properties cleanly from zero depth
             if (music) {
                 music.volume = 1.0;
                 music.currentTime = 0;
-                music.play().catch(err => console.log("Audio reset caught"));
+                music.play().catch(err => console.log("Audio restart permission catch"));
             }
+            
+            // Kickstart the sequence timing rotation automatically immediately
+            startAutoplay();
         }
 
         function kickstartAudio() {
             if (music && music.paused && isAutoplayActive && currentSlide !== 3) {
-                music.play().catch(err => console.log("Audio kickstart caught"));
+                music.play().catch(err => console.log("Audio user gesture interaction update"));
             }
         }
 
