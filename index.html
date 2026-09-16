@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rishita & Adithya's Wedding Invitation</title>
     <style>
-        /* Base Global Constraints */
+        /* Base Global Overrides */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -21,7 +21,7 @@
             user-select: none;
         }
 
-        /* Mobile Layout Shell Container */
+        /* Mobile Sandbox Wrapper Frame */
         .invitation-container {
             position: relative;
             width: 100%;
@@ -33,7 +33,7 @@
             box-shadow: 0 0 40px rgba(0,0,0,0.15);
         }
 
-        /* FRONT COVER LAYER: Full screen gate overlay */
+        /* FRONT COVER OVERLAY FRAME */
         .temple-gate-overlay {
             position: absolute;
             top: 0;
@@ -45,33 +45,39 @@
             cursor: pointer;
             visibility: visible;
             opacity: 1;
-            transition: opacity 0.5s ease 3.5s, visibility 0s linear 4s;
+            transition: opacity 0.4s ease 3.5s, visibility 0s linear 4s;
         }
 
-        /* Split-Window Panels holding half the temple image each */
+        /* Rigid Split Door Windows to force graphics to display */
         .gate-door-panel {
             width: 50%;
             height: 100%;
             position: relative;
             overflow: hidden;
+            background-color: #fff;
             transition: transform 3.5s cubic-bezier(0.45, 0, 0.55, 1);
         }
+        
+        /* Forces temple.png to render at full device resolution height */
         .gate-door-panel img {
             position: absolute;
             top: 0;
-            height: 100%;
-            width: 200%; 
-            max-width: none;
-            object-fit: cover;
+            height: 100% !important;
+            width: 200% !important; 
+            max-width: none !important;
+            object-fit: cover !important;
+            display: block !important;
         }
 
-        /* Left and Right Side Image Alignment rules */
+        /* Left Door Asset Alignment mapping */
         .gate-door-panel.left { transform-origin: left center; }
-        .gate-door-panel.left img { left: 0; }
-        .gate-door-panel.right { transform-origin: right center; }
-        .gate-door-panel.right img { right: 0; }
+        .gate-door-panel.left img { left: 0 !important; }
 
-        /* Slide Transitions when 'is-open' class is added */
+        /* Right Door Asset Alignment mapping */
+        .gate-door-panel.right { transform-origin: right center; }
+        .gate-door-panel.right img { right: 0 !important; }
+
+        /* Slid Animation Trigger States */
         .temple-gate-overlay.is-open .gate-door-panel.left { transform: translateX(-100%); }
         .temple-gate-overlay.is-open .gate-door-panel.right { transform: translateX(100%); }
         .temple-gate-overlay.is-open {
@@ -80,7 +86,7 @@
             pointer-events: none;
         }
 
-        /* Floating Tap Prompt Indicator Button */
+        /* Tap Prompt Badge graphic */
         .tap-prompt-banner {
             position: absolute;
             bottom: 14%;
@@ -102,7 +108,7 @@
         }
         .temple-gate-overlay.is-open .tap-prompt-banner { opacity: 0; }
 
-        /* Slideshow Viewport Container */
+        /* Isolated Presentation Slideshow Architecture */
         .slides-viewport {
             width: 100%;
             height: 100%;
@@ -119,28 +125,23 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            padding: 20px 15px 100px 15px;
+            justify-content: center;
+            padding: 20px;
             background: #fff;
-            transition: opacity 0.5s ease, visibility 0.5s;
+            transition: opacity 0.4s ease, visibility 0.4s;
         }
         .invitation-page-slide.active-slide {
             opacity: 1;
             visibility: visible;
         }
 
-        /* Typography & Card Container Formatting */
-        .wedding-main-title {
-            margin: 10px 0 15px 0;
-            color: #8b0000;
-            font-size: 1.5rem;
-            letter-spacing: 1px;
-            text-align: center;
-        }
+        /* Standardized Image Card Scaling Rules */
         .invitation-card-img {
-            max-width: 100%;
-            max-height: 72vh;
-            object-fit: contain;
+            width: 100% !important;
+            height: auto !important;
+            max-height: 85vh !important;
+            object-fit: contain !important;
+            display: block !important;
             border-radius: 4px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.06);
         }
@@ -148,12 +149,13 @@
         /* Isolated RSVP Page Block */
         .rsvp-card-block {
             width: 100%;
+            max-width: 400px;
             background: #fffcf5;
             border: 1px double #d4af37;
-            padding: 30px 20px;
-            margin-top: 40px;
+            padding: 35px 20px;
             border-radius: 6px;
             text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
         }
         .rsvp-action-link, .replay-action-btn {
             display: inline-block;
@@ -171,7 +173,7 @@
         }
         .rsvp-action-link:hover, .replay-action-btn:hover { background: #a30000; }
 
-        /* Floating Nav & Media Controls Bar (◀ ⏸ ▶) */
+        /* Navigation and Player Interface Bar (◀ ⏸ ▶) */
         .audio-player-controls {
             position: absolute;
             bottom: 25px;
@@ -205,7 +207,7 @@
 
 <div class="invitation-container">
 
-    <!-- FRONT COVER OVERLAY: Split doors mapping directly to temple.png -->
+    <!-- FRONT COVER OVERLAY: Split doors mapping straight to temple.png -->
     <div class="temple-gate-overlay" id="templeGate" onclick="executeGateOpening()">
         <div class="gate-door-panel left">
             <img src="temple.png" alt="Temple Cover Left">
@@ -219,16 +221,14 @@
     <!-- MAIN INTERACTIVE SLIDESHOW FRAMES -->
     <div class="slides-viewport">
         
-        <!-- PAGE 1: Main Wedding Invitation Card (renamed to marriage.png) -->
+        <!-- PAGE 1: Maapillai Azhaippu Event details -->
         <div class="invitation-page-slide active-slide" id="slide0">
-            <h1 class="wedding-main-title">Rishita & Adithya</h1>
-            <img src="marriage.png" alt="Rishita & Adithya Wedding Invitation" class="invitation-card-img">
-        </div>
-        
-        <!-- PAGE 2: Maapillai Azhaippu Event details -->
-        <div class="invitation-page-slide" id="slide1">
-            <h1 class="wedding-main-title">Rishita & Adithya</h1>
             <img src="maapillai.png" alt="Maapillai Azhaippu Details" class="invitation-card-img">
+        </div>
+
+        <!-- PAGE 2: Main Wedding Invitation Card (marriage.png) -->
+        <div class="invitation-page-slide" id="slide1">
+            <img src="marriage.png" alt="Rishita & Adithya Wedding Invitation" class="invitation-card-img">
         </div>
         
         <!-- PAGE 3: Final Isolated RSVP Page with Reset Loop Trigger -->
@@ -236,10 +236,11 @@
             <div class="rsvp-card-block">
                 <h2 style="color: #8b0000; margin-bottom: 10px;">RSVP</h2>
                 <p style="font-size: 1rem; color: #666; line-height: 1.5;">Please RSVP to help us plan our celebrations</p>
+                <!-- Direct redirect straight to WithJoy RSVP Engine link context -->
                 <a href="https://withjoy.com" class="rsvp-action-link" onclick="handleRSVPSubmission(event)">Respond Here</a>
             </div>
             
-            <div style="margin-top: 40px;">
+            <div style="margin-top: 30px;">
                 <button class="replay-action-btn" style="background: #666;" onclick="triggerAutoOpenReset()">View Invitation Again</button>
             </div>
         </div>
@@ -307,7 +308,7 @@
         // Kill music playback cleanly upon RSVP submit action
         audioTrack.pause();
         playPauseBtn.innerText = "▶";
-        isPlaying = false;
+        isTrackPlaying = false;
         
         // Enforce fallback location routing redirection across any user handset device
         window.location.href = "https://withjoy.com";
