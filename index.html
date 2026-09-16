@@ -20,8 +20,8 @@
             min-height: 100vh;
             padding: 20px;
         }
-        /* Interactive Invitation Card Frame */
-        .invitation-slider {
+        /* Fixed Frame for Invitation Layout */
+        .slider-container {
             position: relative;
             width: 100%;
             max-width: 500px;
@@ -39,14 +39,14 @@
             height: auto;
             display: block;
         }
-        /* Navigation Controls Overlay */
+        /* Buttons Toolbar Design */
         .slider-controls {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 20px;
             padding: 16px;
-            background: rgba(255, 255, 255, 0.95);
+            background: #ffffff;
             border-top: 1px solid #f0e9dc;
         }
         .control-btn {
@@ -58,22 +58,20 @@
             font-weight: bold;
             border-radius: 25px;
             cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            min-width: 90px;
+            transition: background-color 0.2s ease;
+            min-width: 95px;
             text-align: center;
         }
         .control-btn:hover {
             background-color: #2b3f30;
         }
-        .control-btn:active {
-            transform: scale(0.97);
-        }
-        /* Fixed RSVP Link Section */
+        /* RSVP Link Area */
         .rsvp-footer {
             width: 100%;
             max-width: 500px;
             text-align: center;
             margin-top: 24px;
+            z-index: 10;
         }
         .rsvp-link-btn {
             display: inline-block;
@@ -92,65 +90,59 @@
             background-color: #9e772f;
             transform: translateY(-2px);
         }
-        .rsvp-link-btn:active {
-            transform: translateY(0);
-        }
     </style>
 </head>
 <body>
 
-    <!-- Invitation Card Frame -->
-    <div class="invitation-slider">
-        <!-- Card 1: Temple Theme Cover -->
+    <!-- Main Card Display Frame -->
+    <div class="slider-container">
+        <!-- Card 1: Traditional Temple Cover -->
         <div class="slide-item">
-            <img src="image_w6JIXe.png" alt="Traditional Temple Cover Graphic">
+            <img src="./image_w6JIXe.png" alt="Traditional Temple Cover">
         </div>
         
-        <!-- Card 2: December 3rd - Maapillai Azhaippu -->
+        <!-- Card 2: Maapillai Azhaippu -->
         <div class="slide-item">
-            <img src="image_Vp6zYa.png" alt="Maapillai Azhaippu Event Card">
+            <img src="./image_Vp6zYa.png" alt="Maapillai Azhaippu Event">
         </div>
 
-        <!-- Card 3: December 4th - Main Muhurtham Wedding -->
+        <!-- Card 3: Main Wedding Muhurtham -->
         <div class="slide-item">
-            <img src="image_U3jU8C.png" alt="Main Wedding Invitation Card">
+            <img src="./image_U3jU8C.png" alt="Main Wedding Card">
         </div>
 
-        <!-- Navigation Controls -->
+        <!-- Toolbar Back/Pause/Forward Controls -->
         <div class="slider-controls">
-            <button class="control-btn" id="backwardBtn" onclick="navigateSlides(-1)">◀ Back</button>
+            <button class="control-btn" onclick="navigateSlides(-1)">◀ Back</button>
             <button class="control-btn" id="playPauseBtn" onclick="toggleAutoplay()">⏸ Pause</button>
-            <button class="control-btn" id="forwardBtn" onclick="navigateSlides(1)">Next ▶</button>
+            <button class="control-btn" onclick="navigateSlides(1)">Next ▶</button>
         </div>
     </div>
 
-    <!-- RSVP Link Section -->
+    <!-- RSVP Anchor Link Section -->
     <div class="rsvp-footer">
-        <a href="https://withjoy.com/rishitadithya/rsvp" target="_blank" class="rsvp-link-btn">
+        <a href="https://withjoy.com" target="_blank" rel="noopener noreferrer" class="rsvp-link-btn">
             Click Here to RSVP
         </a>
     </div>
 
-    <!-- Control Operations & Autoplay Logic -->
+    <!-- Slider Mechanism Script -->
     <script>
         let currentSlide = 0;
         let autoplayTimer;
         let isAutoplayActive = true;
-        const slideDuration = 4000; // Changes card every 4 seconds
+        const slideDuration = 4000; 
 
         const allSlides = document.getElementsByClassName("slide-item");
         const playPauseButton = document.getElementById("playPauseBtn");
 
         function renderSlide() {
-            // Hide all cards
             for (let i = 0; i < allSlides.length; i++) {
                 allSlides[i].style.display = "none";  
             }
-            // Loop check boundaries
             if (currentSlide >= allSlides.length) { currentSlide = 0; }
             if (currentSlide < 0) { currentSlide = allSlides.length - 1; }
             
-            // Display active card
             allSlides[currentSlide].style.display = "block";  
         }
 
@@ -190,7 +182,7 @@
             }
         }
 
-        // Initialize execution on load
+        // Run on Page Load
         renderSlide();
         startAutoplay();
     </script>
