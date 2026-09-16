@@ -19,8 +19,9 @@
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
+            -webkit-text-size-adjust: 100%;
         }
-        /* Fixed Frame for Invitation Layout */
+        /* Mobile-First Layout Frame */
         .slider-container {
             position: relative;
             width: 100%;
@@ -30,21 +31,23 @@
             border-radius: 16px;
             overflow: hidden;
         }
+        /* Forces clean rendering rules on iPhone */
         .slide-item {
             display: none;
             width: 100%;
+            animation: fadeIn 0.4s ease-in-out;
         }
         .slide-item img {
             width: 100%;
             height: auto;
             display: block;
         }
-        /* Buttons Toolbar Design */
+        /* Audio and Navigation Control Dashboard */
         .slider-controls {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             padding: 16px;
             background: #ffffff;
             border-top: 1px solid #f0e9dc;
@@ -53,14 +56,14 @@
             background-color: #3d5a45;
             color: #ffffff;
             border: none;
-            padding: 10px 20px;
-            font-size: 15px;
+            padding: 10px 18px;
+            font-size: 14px;
             font-weight: bold;
             border-radius: 25px;
             cursor: pointer;
-            transition: background-color 0.2s ease;
-            min-width: 95px;
+            min-width: 90px;
             text-align: center;
+            -webkit-appearance: none; /* Disables default iOS styling override */
         }
         .control-btn:hover {
             background-color: #2b3f30;
@@ -71,7 +74,6 @@
             max-width: 500px;
             text-align: center;
             margin-top: 24px;
-            z-index: 10;
         }
         .rsvp-link-btn {
             display: inline-block;
@@ -84,15 +86,18 @@
             letter-spacing: 0.5px;
             border-radius: 30px;
             box-shadow: 0 6px 20px rgba(188, 144, 60, 0.3);
-            transition: background-color 0.2s ease, transform 0.2s ease;
+            -webkit-appearance: none;
         }
-        .rsvp-link-btn:hover {
-            background-color: #9e772f;
-            transform: translateY(-2px);
+        @keyframes fadeIn {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
+
+    <!-- HTML5 Audio Core (Add your music filename here) -->
+    <audio id="bgMusic" src="./wedding_music.mp3" loop preload="auto"></audio>
 
     <!-- Main Card Display Frame -->
     <div class="slider-container">
@@ -101,7 +106,7 @@
             <img src="./image_w6JIXe.png" alt="Traditional Temple Cover">
         </div>
         
-        <!-- Card 2: Maapillai Azhaippu -->
+        <!-- Card 2: Maapillai Azhaippu (Haldi/Event) -->
         <div class="slide-item">
             <img src="./image_Vp6zYa.png" alt="Maapillai Azhaippu Event">
         </div>
@@ -111,7 +116,7 @@
             <img src="./image_U3jU8C.png" alt="Main Wedding Card">
         </div>
 
-        <!-- Toolbar Back/Pause/Forward Controls -->
+        <!-- Navigation Controls Toolbar -->
         <div class="slider-controls">
             <button class="control-btn" onclick="navigateSlides(-1)">◀ Back</button>
             <button class="control-btn" id="playPauseBtn" onclick="toggleAutoplay()">⏸ Pause</button>
@@ -119,14 +124,14 @@
         </div>
     </div>
 
-    <!-- RSVP Anchor Link Section -->
+    <!-- RSVP Redirect Section -->
     <div class="rsvp-footer">
-        <a href="https://withjoy.com" target="_blank" rel="noopener noreferrer" class="rsvp-link-btn">
+        <a href="https://withjoy.com" target="_blank" rel="noopener noreferrer" class="rsvp-link-btn" onclick="kickstartAudio()">
             Click Here to RSVP
         </a>
     </div>
 
-    <!-- Slider Mechanism Script -->
+    <!-- Slider & iOS Audio Engine Optimization -->
     <script>
         let currentSlide = 0;
         let autoplayTimer;
@@ -135,13 +140,19 @@
 
         const allSlides = document.getElementsByClassName("slide-item");
         const playPauseButton = document.getElementById("playPauseBtn");
+        const music = document.getElementById("bgMusic");
 
+        // Safe Rendering Engine for iOS Safari
         function renderSlide() {
+            if (allSlides.length === 0) return;
+
+            // Handle boundaries cleanly without crashing execution
+            if (currentSlide >= allSlides.length) { currentSlide = 0; }
+            if (currentSlide < 0) { currentSlide = allSlides.length - 1; }
+
             for (let i = 0; i < allSlides.length; i++) {
                 allSlides[i].style.display = "none";  
             }
-            if (currentSlide >= allSlides.length) { currentSlide = 0; }
-            if (currentSlide < 0) { currentSlide = allSlides.length - 1; }
             
             allSlides[currentSlide].style.display = "block";  
         }
@@ -161,6 +172,7 @@
 
         function navigateSlides(direction) {
             clearAutoplay();
+            kickstartAudio(); // Unlock audio on manual click
             currentSlide += direction;
             renderSlide();
             if (isAutoplayActive) {
@@ -171,9 +183,11 @@
         function toggleAutoplay() {
             if (isAutoplayActive) {
                 clearAutoplay();
+                music.pause();
                 playPauseButton.innerHTML = "▶ Play";
                 isAutoplayActive = false;
             } else {
+                kickstartAudio();
                 currentSlide++;
                 renderSlide();
                 startAutoplay();
@@ -182,9 +196,24 @@
             }
         }
 
-        // Run on Page Load
-        renderSlide();
-        startAutoplay();
+        // Bypasses iOS Autoplay Restrictions on first user interaction
+        function kickstartAudio() {
+            if (music && music.paused && isAutoplayActive) {
+                music.play().catch(function(error) {
+                    console.log("Audio kickstart caught: ", error);
+                });
+            }
+        }
+
+        // Global touch unlock for iPhone user profiles
+        document.addEventListener('touchstart', kickstartAudio, { once: true });
+        document.addEventListener('click', kickstartAudio, { once: true });
+
+        // Force initial initialization
+        document.addEventListener("DOMContentLoaded", function() {
+            renderSlide();
+            startAutoplay();
+        });
     </script>
 
 </body>
