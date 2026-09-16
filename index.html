@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rishita & Adithya's Wedding Invitation</title>
     <style>
-        /* Document Optimization */
+        /* Base Reset */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -15,12 +15,12 @@
             width: 100%;
             height: 100%;
             font-family: 'Georgia', serif;
-            background-color: #fcfbf7;
+            background-color: #f7f5f0;
             color: #333;
             overflow: hidden;
         }
 
-        /* Responsive Mobile Sandbox Container */
+        /* Mobile-Sized Content Container Sandbox */
         .invitation-container {
             position: relative;
             width: 100%;
@@ -28,11 +28,11 @@
             height: 100vh;
             margin: 0 auto;
             overflow: hidden;
-            box-shadow: 0 0 35px rgba(0,0,0,0.15);
+            box-shadow: 0 0 40px rgba(0,0,0,0.15);
             background: #fff;
         }
 
-        /* Temple Gates Splitting Overlay Layer */
+        /* Temple Gate Full-Screen Interactive Shell */
         .temple-gate-overlay {
             position: absolute;
             top: 0;
@@ -42,92 +42,98 @@
             display: flex;
             cursor: pointer;
             z-index: 1000;
-            transition: visibility 0s linear 3s; 
+            opacity: 1;
+            /* Ensures total clearance after sliding finishes */
+            transition: opacity 0.5s ease 2.5s, visibility 0s linear 3s; 
         }
         
-        /* Interactive Left/Right Panels Using One Unified Asset File */
+        /* Automatic 50/50 split of the image_chvh-Z.png file across doors */
         .gate-door {
             width: 50%;
             height: 100%;
-            background-image: url('image_z8uVjx.png');
+            background-image: url('image_chvh-Z.png');
             background-size: 200% 100%;
             background-repeat: no-repeat;
-            transition: transform 3s cubic-bezier(0.42, 0, 0.58, 1);
+            transition: transform 2.5s cubic-bezier(0.42, 0, 0.58, 1);
         }
         .gate-door.left {
             background-position: left center;
-            border-right: 1px dashed rgba(212, 175, 55, 0.4);
+            border-right: 1px dashed rgba(212, 175, 55, 0.3);
         }
         .gate-door.right {
             background-position: right center;
-            border-left: 1px dashed rgba(212, 175, 55, 0.4);
+            border-left: 1px dashed rgba(212, 175, 55, 0.3);
         }
 
-        /* Trigger States for Splitting Split Animation */
+        /* Slide mechanics when triggered */
         .temple-gate-overlay.is-open .gate-door.left {
             transform: translateX(-100%);
         }
         .temple-gate-overlay.is-open .gate-door.right {
             transform: translateX(100%);
         }
+        
+        /* Collapse overlay entirely so it cannot block scrolling or tapping */
         .temple-gate-overlay.is-open {
+            opacity: 0;
             visibility: hidden;
             pointer-events: none;
         }
 
-        /* Centered Entry Action Banner */
+        /* Entry Hint Banner */
         .tap-prompt {
             position: absolute;
             bottom: 15%;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.94);
             border: 1px solid #d4af37;
-            padding: 14px 32px;
-            border-radius: 30px;
-            font-size: 0.95rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 0.9rem;
             font-weight: bold;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             color: #8b0000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-            animation: interactivePulse 2.5s infinite;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: bounceIndicator 2.5s infinite;
             pointer-events: none;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease;
             text-align: center;
         }
         .temple-gate-overlay.is-open .tap-prompt {
             opacity: 0;
         }
 
-        /* Scrollable Invitation Content Layout Below Overlay */
+        /* Scrollable Invitation Inner Viewport */
         .main-content {
             width: 100%;
             height: 100%;
             overflow-y: auto;
-            padding: 20px 15px 100px 15px;
+            padding: 25px 15px 120px 15px;
             text-align: center;
             scroll-behavior: smooth;
         }
-        .wedding-brand-title {
-            margin: 15px 0 25px 0;
+        .wedding-main-title {
+            margin: 10px 0 25px 0;
             color: #8b0000;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             letter-spacing: 1px;
         }
         .invitation-card-img {
             width: 100%;
             height: auto;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            display: block;
+            margin: 0 auto 25px auto;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
 
-        /* Integrated RSVP Card Layout Section */
+        /* Action Forms Block Wrapper */
         .rsvp-card-block {
-            background: #fffbf2;
+            background: #fffcf5;
             border: 1px double #d4af37;
             padding: 25px 20px;
-            margin: 30px 5px;
+            margin: 35px 5px;
             border-radius: 6px;
         }
         .rsvp-action-link, .replay-action-btn {
@@ -142,14 +148,13 @@
             margin-top: 15px;
             text-decoration: none;
             font-weight: bold;
-            box-shadow: 0 2px 8px rgba(139,0,0,0.25);
             transition: background 0.2s;
         }
         .rsvp-action-link:hover, .replay-action-btn:hover {
             background: #a30000;
         }
 
-        /* Floating Multimedia Control Interface (◀ ⏸ ▶) */
+        /* Music Controls Player Hub (◀ ⏸ ▶) */
         .audio-player-controls {
             position: absolute;
             bottom: 25px;
@@ -157,13 +162,13 @@
             transform: translateX(-50%);
             background: rgba(139, 0, 0, 0.96);
             border: 1px solid #d4af37;
-            padding: 8px 22px;
+            padding: 8px 24px;
             border-radius: 25px;
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 25px;
             z-index: 900;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         .audio-control-node {
             background: none;
@@ -177,9 +182,9 @@
             color: #d4af37;
         }
 
-        @keyframes interactivePulse {
+        @keyframes bounceIndicator {
             0%, 100% { transform: translateX(-50%) scale(1); }
-            50% { transform: translateX(-50%) translateY(-3px) scale(1.02); }
+            50% { transform: translateX(-50%) translateY(-4px) scale(1.02); }
         }
     </style>
 </head>
@@ -187,99 +192,92 @@
 
 <div class="invitation-container">
 
-    <!-- FRONT COVER OVERLAY: Automatically splits cover asset 'image_z8uVjx.png' on interaction -->
-    <div class="temple-gate-overlay" id="templeGate" onclick="triggerGateOpening()">
+    <!-- FRONT COVER OVERLAY: Slides open and hides completely when clicked -->
+    <div class="temple-gate-overlay" id="templeGate" onclick="openTempleGates()">
         <div class="gate-door left"></div>
         <div class="gate-door right"></div>
         <div class="tap-prompt">▲<br>Tap to Enter</div>
     </div>
 
-    <!-- INTERNAL WEBPAGE BODY CONTENT: Active Display Cards -->
+    <!-- INNER WEBPAGE CONTENT LAYOUT: Pages revealed perfectly behind the cover -->
     <div class="main-content" id="mainContent">
-        <h1 class="wedding-brand-title">Rishita & Adithya</h1>
+        <h1 class="wedding-main-title">Rishita & Adithya</h1>
         
-        <!-- Main Wedding Invitation Graphic -->
-        <img src="image_YJMKdK.png" alt="Rishita & Adithya Wedding Invitation" class="invitation-card-img">
+        <!-- Main Wedding Invitation Card -->
+        <img src="image_B0Acge.png" alt="Rishita & Adithya Wedding Invitation" class="invitation-card-img">
         
-        <!-- Secondary Event Graphic: Maapillai Azhaippu -->
-        <img src="image_QjCMwE.png" alt="Maapillai Azhaippu Event Details" class="invitation-card-img">
+        <!-- Maapillai Azhaippu Event Detail Card -->
+        <img src="image_U58_Bq.png" alt="Maapillai Azhaippu Details" class="invitation-card-img">
         
-        <!-- Interactive RSVP Panel Link Section -->
+        <!-- RSVP Functional Form Block -->
         <div class="rsvp-card-block">
-            <h3 style="color: #8b0000; margin-bottom: 6px;">RSVP</h3>
-            <p style="font-size: 0.9rem; color: #666; line-height: 1.4;">Please RSVP to help us plan our celebrations</p>
-            <!-- Note: Insert your active RSVP form link path into the href parameter below -->
-            <a href="https://your-wedding-rsvp.com" target="_blank" class="rsvp-action-link">Respond Here</a>
+            <h3 style="color: #8b0000; margin-bottom: 5px;">RSVP</h3>
+            <p style="font-size: 0.9rem; color: #666;">Please RSVP to help us plan our celebrations</p>
+            <a href="https://your-rsvp-form-url-here.com" target="_blank" class="rsvp-action-link">Respond Here</a>
         </div>
 
-        <!-- Loop Replay Module Engine -->
-        <div style="margin: 25px 0 10px 0;">
-            <button class="replay-action-btn" style="background: #666; box-shadow: none;" onclick="reverseGateClosing()">View Invitation Again</button>
+        <!-- Cover Resetter Module -->
+        <div style="margin: 20px 0;">
+            <button class="replay-action-btn" style="background: #666;" onclick="closeTempleGates()">View Invitation Again</button>
         </div>
     </div>
 
-    <!-- FLOATING FIXED PLAYBACK CONTAINER DESIGN -->
+    <!-- FIXED MEDIA CONTAINER BAR -->
     <div class="audio-player-controls">
-        <button class="audio-control-node" onclick="navigatePreviousTrack()">◀</button>
-        <button class="audio-control-node" id="globalPlayPauseTrigger" onclick="toggleAudioState()">⏸</button>
-        <button class="audio-control-node" onclick="navigateNextTrack()">▶</button>
+        <button class="audio-control-node" onclick="prevTrack()">◀</button>
+        <button class="audio-control-node" id="playPauseBtn" onclick="toggleAudio()">⏸</button>
+        <button class="audio-control-node" onclick="nextTrack()">▶</button>
     </div>
 
 </div>
 
-<!-- Audio Stream Tracker Module -->
-<!-- Note: If using background audio, rename 'audio_track.mp3' to match your audio music track filename -->
-<audio id="backgroundAudioTrack" src="audio_track.mp3" loop></audio>
+<!-- Hidden Background Audio Player Core Instance -->
+<audio id="bgMusic" src="audio_track.mp3" loop></audio>
 
 <script>
-    const gateOverlayNode = document.getElementById('templeGate');
-    const backgroundAudioNode = document.getElementById('backgroundAudioTrack');
-    const statusInterfaceTrigger = document.getElementById('globalPlayPauseTrigger');
+    const gate = document.getElementById('templeGate');
+    const contentPanel = document.getElementById('mainContent');
+    const audioTrack = document.getElementById('bgMusic');
+    const playPauseBtn = document.getElementById('playPauseBtn');
     
-    let isMediaPlaying = false;
+    let isTrackPlaying = false;
 
-    // Triggered on curtain click interaction to begin reveal state
-    function triggerGateOpening() {
-        gateOverlayNode.classList.add('is-open');
-        
-        if (!isMediaPlaying) {
-            executeMediaPlay();
+    // Triggers splitting transition and plays background audio smoothly
+    function openTempleGates() {
+        gate.classList.add('is-open');
+        if (!isTrackPlaying) {
+            startAudioPlayback();
         }
     }
 
-    // Reverses animation status to lock view gate interface back together
-    function reverseGateClosing() {
-        document.getElementById('mainContent').scrollTop = 0;
-        gateOverlayNode.classList.remove('is-open');
+    // Safely pulls doors shut and jumps scroll view back to top
+    function closeTempleGates() {
+        contentPanel.scrollTop = 0;
+        gate.classList.remove('is-open');
     }
 
-    // Interactive Media Execution Controllers
-    function executeMediaPlay() {
-        backgroundAudioNode.play().then(() => {
-            isMediaPlaying = true;
-            statusInterfaceTrigger.innerText = "⏸";
-        }).catch(browserPolicyError => {
-            console.log("Audio play blocked by device auto-play privacy engines until user clicks overlay.");
+    // Media Logic Engine Tools
+    function startAudioPlayback() {
+        audioTrack.play().then(() => {
+            isTrackPlaying = true;
+            playPauseBtn.innerText = "⏸";
+        }).catch(err => {
+            console.log("Device playback engine delayed audio stream initialization until user focus event.");
         });
     }
 
-    function toggleAudioState() {
-        if (isMediaPlaying) {
-            backgroundAudioNode.pause();
-            statusInterfaceTrigger.innerText = "▶";
-            isMediaPlaying = false;
+    function toggleAudio() {
+        if (isTrackPlaying) {
+            audioTrack.pause();
+            playPauseBtn.innerText = "▶";
+            isTrackPlaying = false;
         } else {
-            executeMediaPlay();
+            startAudioPlayback();
         }
     }
 
-    function navigateNextTrack() {
-        console.log("Next track index command logged.");
-    }
-
-    function navigatePreviousTrack() {
-        console.log("Previous track index command logged.");
-    }
+    function nextTrack() { console.log("Next track indexed."); }
+    function prevTrack() { console.log("Previous track indexed."); }
 </script>
 
 </body>
