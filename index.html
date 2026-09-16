@@ -74,6 +74,7 @@
             border: 1px solid #54121e;
             -webkit-appearance: none;
             margin-bottom: 35px;
+            cursor: pointer;
         }
         .rsvp-subtitle {
             color: #4a3b2c;
@@ -156,7 +157,12 @@
             <div class="rsvp-slide-content">
                 <h1 class="rsvp-names">Rishita & Adithya</h1>
                 
-                <a href="https://withjoy.com" target="_blank" rel="noopener noreferrer" class="rsvp-link-btn">
+                <!-- RSVP Button with hardcoded destination link logic -->
+                <a href="https://withjoy.com/rishitadithya/rsvp" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="rsvp-link-btn" 
+                   onclick="window.open('https://withjoy.com/rishitadithya/rsvp', '_blank'); return false;">
                     RSVP
                 </a>
                 
@@ -189,29 +195,26 @@
         function renderSlide() {
             if (allSlides.length === 0) return;
             
-            // Boundary loops
             if (currentSlide >= allSlides.length) { currentSlide = 0; }
             if (currentSlide < 0) { currentSlide = allSlides.length - 1; }
 
-            // Hide all views
             for (let i = 0; i < allSlides.length; i++) {
                 allSlides[i].style.display = "none";  
             }
             
-            // Render active view screen
             allSlides[currentSlide].style.display = "block";  
 
-            // Hide control toolbar completely on BOTH Temple (Index 0) and RSVP (Index 3) pages
+            // Hide toolbar on Temple (0) and RSVP (3)
             if (currentSlide === 0 || currentSlide === 3) {
                 controlsToolbar.style.display = "none";
             } else {
                 controlsToolbar.style.display = "flex";
             }
 
-            // Stop the music and completely kill the auto-loop once it hits the RSVP page
+            // Stop music on RSVP page after 5 seconds
             clearTimeout(musicTimeout);
             if (currentSlide === 3) {
-                clearAutoplay(); // Freezes page layout right here
+                clearAutoplay(); 
                 
                 musicTimeout = setTimeout(function() {
                     if (music && !music.paused) {
@@ -255,7 +258,7 @@
                 isAutoplayActive = true;
                 playPauseButton.innerHTML = "⏸";
                 if (music && currentSlide !== 3) {
-                    music.play().catch(err => console.log("Music play failed or blocked"));
+                    music.play().catch(err => console.log("Audio resume caught"));
                 }
                 renderSlide(); 
                 if (currentSlide !== 3) {
@@ -273,13 +276,13 @@
             startAutoplay();
             if (music) {
                 music.currentTime = 0;
-                music.play().catch(err => console.log("Audio reset waiting for interaction."));
+                music.play().catch(err => console.log("Audio reset caught"));
             }
         }
 
         function kickstartAudio() {
             if (music && music.paused && isAutoplayActive && currentSlide !== 3) {
-                music.play().catch(err => console.log("Awaiting interactive tap event."));
+                music.play().catch(err => console.log("Audio kickstart caught"));
             }
         }
 
