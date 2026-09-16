@@ -249,9 +249,9 @@
 
     <!-- FLOATING MULTIMEDIA PLAYER FOOTER HUB (◀ ⏸ ▶) -->
     <div class="audio-player-controls">
-        <button class="audio-control-node" onclick="navigateSlide(-1)">◀</button>
+        <button class="audio-control-node" onclick="manualNavigation(-1)">◀</button>
         <button class="audio-control-node" id="playPauseBtn" onclick="toggleAudioPlayback()">⏸</button>
-        <button class="audio-control-node" onclick="navigateSlide(1)">▶</button>
+        <button class="audio-control-node" onclick="manualNavigation(1)">▶</button>
     </div>
 
 </div>
@@ -267,6 +267,7 @@
     let currentSlideIndex = 0;
     const totalSlidesCount = 3;
     let isTrackPlaying = false;
+    let autoTransitionTimer = null;
 
     // Checks local session memory state to determine if gate should auto-open on load
     window.addEventListener('DOMContentLoaded', () => {
@@ -274,6 +275,7 @@
             sessionStorage.removeItem('autoOpenTemple'); // Clean state tracking
             gateOverlay.classList.add('is-open');
             startAudioStream();
+            startAutoTransitionLoop();
         }
     });
 
@@ -283,22 +285,51 @@
         if (!isTrackPlaying) {
             startAudioStream();
         }
+        startAutoTransitionLoop();
     }
 
-    // Handles sequential page sliding updates via control arrows
+    // Core Presentation Slide Navigation Engine
     function navigateSlide(direction) {
-        document.getElementById(`slide${currentSlideIndex}`).classList.remove('active-slide');
+        // Strip visibility formatting across all panels to avoid layout caching collisions
+        for (let i = 0; i < totalSlidesCount; i++) {
+            document.getElementById(`slide${i}`).classList.remove('active-slide');
+        }
         
-        currentSlideIndex += direction;
+        // Calculate new destination index safely
+        currentSlideIndex = currentSlideIndex + direction;
         
-        // Loop boundary constraints protection
         if (currentSlideIndex >= totalSlidesCount) {
             currentSlideIndex = 0;
         } else if (currentSlideIndex < 0) {
             currentSlideIndex = totalSlidesCount - 1;
         }
         
+        // Enforce visibility constraint strictly on the target layout node
         document.getElementById(`slide${currentSlideIndex}`).classList.add('active-slide');
+    }
+
+    // Manual navigation handler that clears and restarts the 20-second timer countdown
+    function manualNavigation(direction) {
+        navigateSlide(direction);
+        resetAutoTransitionLoop();
+    }
+
+    // Starts the automated 20-second loop interval clock
+    function startAutoTransitionLoop() {
+        if (autoTransitionTimer === null) {
+            autoTransitionTimer = setInterval(() => {
+                navigateSlide(1); // Advance forward automatically
+            }, 20000); // 20000 milliseconds = 20 seconds
+        }
+    }
+
+    // Resets the countdown so manual clicks don't double-trigger updates
+    function resetAutoTransitionLoop() {
+        if (autoTransitionTimer !== null) {
+            clearInterval(autoTransitionTimer);
+            autoTransitionTimer = null;
+            startAutoTransitionLoop();
+        }
     }
 
     // High-Force Device-Agnostic Redirection Matrix
@@ -308,12 +339,17 @@
             event.stopPropagation();
         }
         
+        // Stop the slideshow loop completely
+        if (autoTransitionTimer !== null) {
+            clearInterval(autoTransitionTimer);
+        }
+        
         // Kill background music playback streams immediately
         audioTrack.pause();
         playPauseBtn.innerText = "▶";
         isTrackPlaying = false;
         
-        const rsvpTargetUrl = "https://withjoy.com/rishitadithya/rsvp";
+        const rsvpTargetUrl = "https://withjoy.com";
         
         // Fail-safe Tier 1: Force open via absolute top window breakout reference
         try {
@@ -323,7 +359,7 @@
             console.log("Top container cross-origin isolated. Falling back to local stack triggers.");
         }
         
-        // Fail-safe Tier 2: Dynamic Native DOM Link Anchor Injection Injection
+        // Fail-safe Tier 2: Dynamic Native DOM Link Anchor Injection
         const breakoutAnchorNode = document.createElement('a');
         breakoutAnchorNode.href = rsvpTargetUrl;
         breakoutAnchorNode.target = '_top'; // Forces breakout of any nested iframe/webview wrapper
@@ -340,6 +376,9 @@
 
     // Stores auto-open command to state registry and drops browser page frame refresh
     function triggerAutoOpenReset() {
+        if (autoTransitionTimer !== null) {
+            clearInterval(autoTransitionTimer);
+        }
         sessionStorage.setItem('autoOpenTemple', 'true');
         window.location.reload();
     }
