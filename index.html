@@ -28,6 +28,10 @@
   .rsvp-caption { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 500; color: var(--ink); font-size: clamp(1.15rem, 4vw, 1.4rem); max-width: 380px; }
   .replay-link { font-family: 'EB Garamond', serif; font-style: italic; color: var(--ink-soft); text-decoration: underline; background: none; border: none; cursor: pointer; font-size: 1.05rem; padding: 8px; margin-top: 15px; }
   #hiddenAudioWrapper { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; overflow: hidden; }
+  .nav-controls { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 20; display: none; gap: 18px; align-items: center; }
+  .nav-btn { width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--gold); background: rgba(26,20,16,0.45); backdrop-filter: blur(2px); color: #fbf3df; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .nav-btn:active { background: rgba(26,20,16,0.7); }
+  #pauseBtn { font-size: 1.15rem; }
 </style>
 </head>
 <body onclick="handleGlobalInteraction()" ontouchstart="handleGlobalInteraction()" onscroll="handleGlobalInteraction()" ontouchmove="handleGlobalInteraction()">
@@ -52,16 +56,26 @@
 
 <div class="screen" id="rsvpScreen">
   <div class="title">Rishita &amp; Adithya</div>
-  <a href="https://withjoy.com" target="_blank" rel="noopener noreferrer" class="rsvp-btn">RSVP</a>
+  <a href="https://withjoy.com/rishitadithya/rsvp" target="_blank" rel="noopener noreferrer" class="rsvp-btn">RSVP</a>
   <div class="rsvp-caption">Please RSVP to help us plan our celebrations</div>
   <button class="replay-link" onclick="restartInvitation(event)">View Invitation Again</button>
 </div>
+
+<div class="nav-controls" id="navControls">
+  <button class="nav-btn" id="prevBtn" aria-label="Previous">&#8249;</button>
+  <button class="nav-btn" id="pauseBtn" aria-label="Pause">&#10073;&#10073;</button>
+  <button class="nav-btn" id="nextBtn" aria-label="Next">&#8250;</button>
+</div>
 <script>
   const slides = document.querySelectorAll('.slide');
-  let currentIdx = 0, slideInterval = null, hasInteracted = false, gateOpened = false;
+  let currentIdx = 0, slideInterval = null, hasInteracted = false, gateOpened = false, isPaused = false;
   const slideDuration = 15000;
   const audio = document.getElementById('bgMusic');
   let fadeTimeoutId = null;
+  const navControls = document.getElementById('navControls');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
 
   function handleGlobalInteraction() {
     if (hasInteracted) return;
@@ -90,6 +104,7 @@
       document.getElementById('gateScreen').classList.add('open');
       setTimeout(() => {
         document.getElementById('gateScreen').style.display = 'none';
+        navControls.style.display = 'flex';
         startTimer();
       }, 1200);
     }, 5000); 
@@ -97,7 +112,7 @@
 
   function startTimer() {
     clearInterval(slideInterval);
-    if (gateOpened) { slideInterval = setInterval(nextSlide, slideDuration); }
+    if (gateOpened && !isPaused) { slideInterval = setInterval(nextSlide, slideDuration); }
   }
 
   function showSlide(index) {
@@ -106,6 +121,7 @@
       clearInterval(slideInterval);
       document.getElementById('sliderScreen').style.display = 'none';
       document.getElementById('rsvpScreen').style.display = 'flex';
+      navControls.style.display = 'none';
       triggerUniversalAudioStopEngine();
     } else {
       slides[currentIdx].classList.add('active');
@@ -123,6 +139,30 @@
 
   function nextSlide() { showSlide(currentIdx + 1); }
 
+  prevBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (currentIdx > 0) { showSlide(currentIdx - 1); }
+  });
+
+  nextBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    showSlide(currentIdx + 1);
+  });
+
+  pauseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    isPaused = !isPaused;
+    if (isPaused) {
+      clearInterval(slideInterval);
+      pauseBtn.innerHTML = '&#9658;';
+      pauseBtn.setAttribute('aria-label', 'Play');
+    } else {
+      startTimer();
+      pauseBtn.innerHTML = '&#10073;&#10073;';
+      pauseBtn.setAttribute('aria-label', 'Pause');
+    }
+  });
+
   function restartInvitation(e) {
     if(e) e.stopPropagation();
     clearTimeout(fadeTimeoutId);
@@ -133,6 +173,10 @@
     document.getElementById('sliderScreen').style.display = 'flex';
     document.getElementById('gateScreen').style.display = 'flex';
     document.getElementById('gateScreen').classList.remove('open');
+    navControls.style.display = 'none';
+    isPaused = false;
+    pauseBtn.innerHTML = '&#10073;&#10073;';
+    pauseBtn.setAttribute('aria-label', 'Pause');
     gateOpened = false; currentIdx = 0; hasInteracted = false;
     
     slides.forEach(s => s.classList.remove('active'));
@@ -148,6 +192,7 @@
       document.getElementById('gateScreen').classList.add('open');
       setTimeout(() => {
         document.getElementById('gateScreen').style.display = 'none';
+        navControls.style.display = 'flex';
         startTimer();
       }, 1200);
     }, 5000);
