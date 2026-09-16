@@ -232,11 +232,12 @@
             <div class="rsvp-slide-content">
                 <h1 class="rsvp-names">Rishita & Adithya</h1>
                 
-                <a href="https://withjoy.com" 
+                <!-- RSVP Button: Fully restored complete tracking link -->
+                <a href="https://withjoy.com/rishitadithya/rsvp?utm_medium=web&utm_source=guest_site_nav&utm_campaign=nav_menu_rsvp" 
                    target="_blank" 
                    rel="noopener noreferrer" 
                    class="rsvp-link-btn" 
-                   onclick="window.open('https://withjoy.com', '_blank'); return false;">
+                   onclick="handleRsvpClick(); window.open('https://withjoy.com/rishitadithya/rsvp?utm_medium=web&utm_source=guest_site_nav&utm_campaign=nav_menu_rsvp', '_blank'); return false;">
                     RSVP
                 </a>
                 
@@ -256,7 +257,6 @@
     <script>
         let currentSlide = 0;
         let autoplayTimer;
-        let fadeInterval;
         let isAutoplayActive = true;
         let isFirstLaunch = true; /* Tracks initial launch to lock playback state */
         const slideDuration = 4000; 
@@ -286,40 +286,19 @@
                 controlsToolbar.style.display = "flex";
             }
 
-            /* Manage smooth audio linear fade operations upon hitting RSVP page */
-            clearInterval(fadeInterval);
+            /* Freeze slide auto-rotation on RSVP card, but keep music playing persistently */
             if (currentSlide === 3) {
                 clearAutoplay(); 
-                fadeOutAudio(5000); // Fades volume down step-by-step over 5 seconds
             }
         }
 
-        /* Volume lowering calculation engine */
-        function fadeOutAudio(duration) {
-            if (!music || music.paused) return;
-            
-            const startVolume = 1.0;
-            music.volume = startVolume;
-            
-            const fadeSteps = 50; 
-            const stepTime = duration / fadeSteps;
-            const volumeDecreasePerStep = startVolume / fadeSteps;
-            
-            let currentStep = 0;
-            
-            fadeInterval = setInterval(function() {
-                currentStep++;
-                let newVolume = startVolume - (volumeDecreasePerStep * currentStep);
-                
-                if (newVolume <= 0) {
-                    clearInterval(fadeInterval);
-                    music.pause();
-                    music.volume = 1.0; // Reset ceiling back to max for flawless subsequent loops
-                    playPauseButton.innerHTML = "▶";
-                } else {
-                    music.volume = newVolume;
-                }
-            }, stepTime);
+        /* Pauses music and syncs visual indicator state immediately when RSVP link is tapped */
+        function handleRsvpClick() {
+            if (music && !music.paused) {
+                music.pause();
+                isAutoplayActive = false;
+                playPauseButton.innerHTML = "▶";
+            }
         }
 
         /* Triggered when user explicitly taps anywhere inside Temple Card layout */
@@ -352,8 +331,6 @@
 
         function navigateSlides(direction) {
             clearAutoplay();
-            clearInterval(fadeInterval);
-            if (music) music.volume = 1.0; // Restore full audio volume during forced interaction steps
             kickstartAudio();
             currentSlide += direction;
             renderSlide();
@@ -365,16 +342,14 @@
         function toggleAutoplay() {
             if (isAutoplayActive) {
                 clearAutoplay();
-                clearInterval(fadeInterval);
                 if (music) music.pause();
                 playPauseButton.innerHTML = "▶";
                 isAutoplayActive = false;
             } else {
                 isAutoplayActive = true;
                 playPauseButton.innerHTML = "⏸";
-                if (music) music.volume = 1.0;
                 if (music && currentSlide !== 3) {
-                    music.play().catch(err => console.log("Audio pipeline catch"));
+                    music.play().catch(err => console.log("Audio resume caught"));
                 }
                 renderSlide(); 
                 if (currentSlide !== 3) {
@@ -386,7 +361,6 @@
         /* REPLAY ENGINE: Sets up instant automatic playback bypassing initial click constraints */
         function restartSlideshow() {
             clearAutoplay();
-            clearInterval(fadeInterval);
             
             // Bypass initial template gesture blocks for seamless immediate playback loop
             isFirstLaunch = false; 
