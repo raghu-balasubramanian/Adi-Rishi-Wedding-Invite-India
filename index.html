@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rishita & Adithya's Wedding Invitation</title>
     <style>
-        /* Base Reset */
+        /* Base Global Constraints */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -15,12 +15,11 @@
             width: 100%;
             height: 100%;
             font-family: 'Georgia', serif;
-            background-color: #f7f5f0;
-            color: #333;
+            background-color: #f6f4ee;
             overflow: hidden;
         }
 
-        /* Mobile-Sized Content Container Sandbox */
+        /* Mobile Layout Shell Container */
         .invitation-container {
             position: relative;
             width: 100%;
@@ -28,11 +27,11 @@
             height: 100vh;
             margin: 0 auto;
             overflow: hidden;
-            box-shadow: 0 0 40px rgba(0,0,0,0.15);
             background: #fff;
+            box-shadow: 0 0 40px rgba(0,0,0,0.15);
         }
 
-        /* Temple Gate Full-Screen Interactive Shell */
+        /* FRONT COVER SHELL: Contains the split-door viewport panels */
         .temple-gate-overlay {
             position: absolute;
             top: 0;
@@ -40,81 +39,97 @@
             width: 100%;
             height: 100%;
             display: flex;
-            cursor: pointer;
             z-index: 1000;
+            cursor: pointer;
+            visibility: visible;
             opacity: 1;
-            /* Ensures total clearance after sliding finishes */
-            transition: opacity 0.5s ease 2.5s, visibility 0s linear 3s; 
-        }
-        
-        /* Automatic 50/50 split of the image_chvh-Z.png file across doors */
-        .gate-door {
-            width: 50%;
-            height: 100%;
-            background-image: url('image_chvh-Z.png');
-            background-size: 200% 100%;
-            background-repeat: no-repeat;
-            transition: transform 2.5s cubic-bezier(0.42, 0, 0.58, 1);
-        }
-        .gate-door.left {
-            background-position: left center;
-            border-right: 1px dashed rgba(212, 175, 55, 0.3);
-        }
-        .gate-door.right {
-            background-position: right center;
-            border-left: 1px dashed rgba(212, 175, 55, 0.3);
+            transition: opacity 0.5s ease 3.5s, visibility 0s linear 4s;
         }
 
-        /* Slide mechanics when triggered */
-        .temple-gate-overlay.is-open .gate-door.left {
+        /* Panel Windows that hide/reveal half of the graphic */
+        .gate-door-panel {
+            width: 50%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            transition: transform 3.5s cubic-bezier(0.45, 0, 0.55, 1);
+        }
+
+        /* Aligns the native image across both sliding doors */
+        .gate-door-panel img {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 200%; 
+            max-width: none;
+            object-fit: cover;
+        }
+
+        /* Left Side Alignment Constraints */
+        .gate-door-panel.left {
+            transform-origin: left center;
+        }
+        .gate-door-panel.left img {
+            left: 0;
+        }
+
+        /* Right Side Alignment Constraints */
+        .gate-door-panel.right {
+            transform-origin: right center;
+        }
+        .gate-door-panel.right img {
+            right: 0;
+        }
+
+        /* Execution States: Slides the full panels completely clear */
+        .temple-gate-overlay.is-open .gate-door-panel.left {
             transform: translateX(-100%);
         }
-        .temple-gate-overlay.is-open .gate-door.right {
+        .temple-gate-overlay.is-open .gate-door-panel.right {
             transform: translateX(100%);
         }
-        
-        /* Collapse overlay entirely so it cannot block scrolling or tapping */
         .temple-gate-overlay.is-open {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
         }
 
-        /* Entry Hint Banner */
-        .tap-prompt {
+        /* Prompt Action Indicator Link Box */
+        .tap-prompt-banner {
             position: absolute;
-            bottom: 15%;
+            bottom: 14%;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.94);
+            background: rgba(255, 255, 255, 0.95);
             border: 1px solid #d4af37;
-            padding: 12px 30px;
+            padding: 12px 34px;
             border-radius: 25px;
             font-size: 0.9rem;
             font-weight: bold;
             letter-spacing: 1px;
             color: #8b0000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            animation: bounceIndicator 2.5s infinite;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            animation: rhythmicPulse 2.5s infinite;
             pointer-events: none;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.4s;
             text-align: center;
+            z-index: 1010;
         }
-        .temple-gate-overlay.is-open .tap-prompt {
+        .temple-gate-overlay.is-open .tap-prompt-banner {
             opacity: 0;
         }
 
-        /* Scrollable Invitation Inner Viewport */
-        .main-content {
+        /* Internal Scrollable Wedding Cards Base */
+        .main-content-viewport {
             width: 100%;
             height: 100%;
             overflow-y: auto;
-            padding: 25px 15px 120px 15px;
+            padding: 20px 15px 120px 15px;
             text-align: center;
             scroll-behavior: smooth;
         }
         .wedding-main-title {
-            margin: 10px 0 25px 0;
+            margin: 15px 0 25px 0;
             color: #8b0000;
             font-size: 1.5rem;
             letter-spacing: 1px;
@@ -124,11 +139,11 @@
             height: auto;
             display: block;
             margin: 0 auto 25px auto;
-            border-radius: 6px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
         }
 
-        /* Action Forms Block Wrapper */
+        /* RSVP Functional Module Form Box Wrapper */
         .rsvp-card-block {
             background: #fffcf5;
             border: 1px double #d4af37;
@@ -154,7 +169,7 @@
             background: #a30000;
         }
 
-        /* Music Controls Player Hub (◀ ⏸ ▶) */
+        /* Floating Audio Controls Strip (◀ ⏸ ▶) */
         .audio-player-controls {
             position: absolute;
             bottom: 25px;
@@ -176,13 +191,9 @@
             color: #fff;
             font-size: 1.1rem;
             cursor: pointer;
-            transition: color 0.2s;
-        }
-        .audio-control-node:hover {
-            color: #d4af37;
         }
 
-        @keyframes bounceIndicator {
+        @keyframes rhythmicPulse {
             0%, 100% { transform: translateX(-50%) scale(1); }
             50% { transform: translateX(-50%) translateY(-4px) scale(1.02); }
         }
@@ -192,37 +203,41 @@
 
 <div class="invitation-container">
 
-    <!-- FRONT COVER OVERLAY: Slides open and hides completely when clicked -->
-    <div class="temple-gate-overlay" id="templeGate" onclick="openTempleGates()">
-        <div class="gate-door left"></div>
-        <div class="gate-door right"></div>
-        <div class="tap-prompt">▲<br>Tap to Enter</div>
+    <!-- FRONT COVER LAYER: Splitting gate overlay containing temple.png -->
+    <div class="temple-gate-overlay" id="templeGate" onclick="executeGateOpening()">
+        <div class="gate-door-panel left">
+            <img src="temple.png" alt="Temple Cover Left">
+        </div>
+        <div class="gate-door-panel right">
+            <img src="temple.png" alt="Temple Cover Right">
+        </div>
+        <div class="tap-prompt-banner">▲<br>Tap to Enter</div>
     </div>
 
-    <!-- INNER WEBPAGE CONTENT LAYOUT: Pages revealed perfectly behind the cover -->
-    <div class="main-content" id="mainContent">
+    <!-- MAIN CARDS VIEWPORT LAYOUT: Stacked securely behind the overlay -->
+    <div class="main-content-viewport" id="mainContent">
         <h1 class="wedding-main-title">Rishita & Adithya</h1>
         
-        <!-- Main Wedding Invitation Card -->
-        <img src="image_B0Acge.png" alt="Rishita & Adithya Wedding Invitation" class="invitation-card-img">
+        <!-- Main Wedding Invitation Image Page -->
+        <img src="wedding.png" alt="Rishita & Adithya Wedding Invitation" class="invitation-card-img">
         
-        <!-- Maapillai Azhaippu Event Detail Card -->
-        <img src="image_U58_Bq.png" alt="Maapillai Azhaippu Details" class="invitation-card-img">
+        <!-- Maapillai Azhaippu Detail Image Page -->
+        <img src="maapillai.png" alt="Maapillai Azhaippu Details" class="invitation-card-img">
         
-        <!-- RSVP Functional Form Block -->
+        <!-- RSVP Functional Form Block Container -->
         <div class="rsvp-card-block">
             <h3 style="color: #8b0000; margin-bottom: 5px;">RSVP</h3>
             <p style="font-size: 0.9rem; color: #666;">Please RSVP to help us plan our celebrations</p>
             <a href="https://your-rsvp-form-url-here.com" target="_blank" class="rsvp-action-link">Respond Here</a>
         </div>
 
-        <!-- Cover Resetter Module -->
+        <!-- Cover Replay Toggle Button -->
         <div style="margin: 20px 0;">
-            <button class="replay-action-btn" style="background: #666;" onclick="closeTempleGates()">View Invitation Again</button>
+            <button class="replay-action-btn" style="background: #666;" onclick="executeGateClosing()">View Invitation Again</button>
         </div>
     </div>
 
-    <!-- FIXED MEDIA CONTAINER BAR -->
+    <!-- FIXED MULTIMEDIA CONTAINER BAR CONTROLS -->
     <div class="audio-player-controls">
         <button class="audio-control-node" onclick="prevTrack()">◀</button>
         <button class="audio-control-node" id="playPauseBtn" onclick="toggleAudio()">⏸</button>
@@ -232,50 +247,51 @@
 </div>
 
 <!-- Hidden Background Audio Player Core Instance -->
-<audio id="bgMusic" src="audio_track.mp3" loop></audio>
+<audio id="bgMusic" src="music.mp3.mp4" loop></audio>
 
 <script>
-    const gate = document.getElementById('templeGate');
-    const contentPanel = document.getElementById('mainContent');
-    const audioTrack = document.getElementById('bgMusic');
-    const playPauseBtn = document.getElementById('playPauseBtn');
+    const gateOverlay = document.getElementById('templeGate');
+    const contentScrollPanel = document.getElementById('mainContent');
+    const audioTrackInstance = document.getElementById('bgMusic');
+    const playPauseBtnNode = document.getElementById('playPauseBtn');
     
     let isTrackPlaying = false;
 
-    // Triggers splitting transition and plays background audio smoothly
-    function openTempleGates() {
-        gate.classList.add('is-open');
+    // Activates sliding frames and initializes music stream safely
+    function executeGateOpening() {
+        gateOverlay.classList.add('is-open');
         if (!isTrackPlaying) {
-            startAudioPlayback();
+            startAudioStream();
         }
     }
 
-    // Safely pulls doors shut and jumps scroll view back to top
-    function closeTempleGates() {
-        contentPanel.scrollTop = 0;
-        gate.classList.remove('is-open');
+    // Snaps gate closed instantly and returns internal page viewport container to top
+    function executeGateClosing() {
+        contentScrollPanel.scrollTop = 0;
+        gateOverlay.classList.remove('is-open');
     }
 
-    // Media Logic Engine Tools
-    function startAudioPlayback() {
-        audioTrack.play().then(() => {
+    // Media Control Modules
+    function startAudioStream() {
+        audioTrackInstance.play().then(() => {
             isTrackPlaying = true;
-            playPauseBtn.innerText = "⏸";
+            playPauseBtnNode.innerText = "⏸";
         }).catch(err => {
-            console.log("Device playback engine delayed audio stream initialization until user focus event.");
+            console.log("Device background audio initializing requires user context interaction.");
         });
     }
 
     function toggleAudio() {
         if (isTrackPlaying) {
-            audioTrack.pause();
-            playPauseBtn.innerText = "▶";
+            audioTrackInstance.pause();
+            playPauseBtnNode.innerText = "▶";
             isTrackPlaying = false;
         } else {
-            startAudioPlayback();
+            startAudioStream();
         }
     }
 
+    // Fallback control handlers for control mapping loops
     function nextTrack() { console.log("Next track indexed."); }
     function prevTrack() { console.log("Previous track indexed."); }
 </script>
