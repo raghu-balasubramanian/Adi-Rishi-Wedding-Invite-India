@@ -1,202 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#1a1410">
-<title>Adithya &amp; Rishita's Wedding</title>
-<style>
-  @import url('https://googleapis.com');
-  :root { --parchment: #efe4cd; --parchment-dark: #e3d4b3; --ink: #4a3524; --ink-soft: #6b5640; --maroon-deep: #5c1a25; --gold: #b8892f; }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-  html, body { height: 100%; background: #000; font-family: 'EB Garamond', serif; overflow: hidden; }
-  .screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
-  #sliderScreen { background: #000; z-index: 1; }
-  .slides-container { width: 100vw; height: 100vh; height: 100dvh; position: relative; overflow: hidden; }
-  .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #fbf9f4; display: flex; align-items: flex-end; justify-content: center; }
-  .slide.active { opacity: 1; }
-  .gate-overlay { position: fixed; inset: 0; z-index: 15; display: flex; overflow: hidden; background: #000; }
-  .gate { width: 50vw; height: 100vh; height: 100dvh; position: relative; overflow: hidden; transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1); }
-  .gate-half { width: 100vw; height: 100vh; height: 100dvh; position: absolute; top: 0; background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #fbf9f4; background-image: url('temple.png'); }
-  .left-gate .gate-half { left: 0; }
-  .right-gate .gate-half { right: 0; }
-  .gate-overlay.open .left-gate { transform: translateX(-100%); }
-  .gate-overlay.open .right-gate { transform: translateX(100%); }
-  #rsvpScreen { flex-direction: column; gap: 28px; padding: 36px; text-align: center; background: radial-gradient(ellipse at 50% -10%, #fbf6ea 0%, var(--parchment) 55%, var(--parchment-dark) 100%); z-index: 5; display: none; }
-  .title { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 600; color: var(--maroon-deep); font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.2; }
-  .rsvp-btn { display: inline-block; font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 600; font-size: clamp(1.2rem, 4.5vw, 1.5rem); color: #fbf3df; background: linear-gradient(160deg, var(--maroon-deep), #7c2331); padding: 16px 54px; border-radius: 44px; text-decoration: none; box-shadow: 0 12px 26px -6px rgba(92,26,37,0.55); border: 1px solid var(--gold); }
-  .rsvp-caption { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 500; color: var(--ink); font-size: clamp(1.15rem, 4vw, 1.4rem); max-width: 380px; }
-  .replay-link { font-family: 'EB Garamond', serif; font-style: italic; color: var(--ink-soft); text-decoration: underline; background: none; border: none; cursor: pointer; font-size: 1.05rem; padding: 8px; margin-top: 15px; }
-  #hiddenAudioWrapper { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; overflow: hidden; }
-  .nav-controls { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 20; display: none; gap: 18px; align-items: center; }
-  .nav-btn { width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--gold); background: rgba(26,20,16,0.45); backdrop-filter: blur(2px); color: #fbf3df; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-  .nav-btn:active { background: rgba(26,20,16,0.7); }
-  #pauseBtn { font-size: 1.15rem; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rishita & Adithya's Wedding Invitation</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #fcf9f2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        /* Interactive Invitation Card Frame */
+        .invitation-slider {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            background: #ffffff;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .slide-item {
+            display: none;
+            width: 100%;
+        }
+        .slide-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        /* Navigation Controls Overlay */
+        .slider-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #f0e9dc;
+        }
+        .control-btn {
+            background-color: #3d5a45;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            min-width: 90px;
+            text-align: center;
+        }
+        .control-btn:hover {
+            background-color: #2b3f30;
+        }
+        .control-btn:active {
+            transform: scale(0.97);
+        }
+        /* Fixed RSVP Link Section */
+        .rsvp-footer {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            margin-top: 24px;
+        }
+        .rsvp-link-btn {
+            display: inline-block;
+            background-color: #bc903c;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 14px 45px;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            border-radius: 30px;
+            box-shadow: 0 6px 20px rgba(188, 144, 60, 0.3);
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .rsvp-link-btn:hover {
+            background-color: #9e772f;
+            transform: translateY(-2px);
+        }
+        .rsvp-link-btn:active {
+            transform: translateY(0);
+        }
+    </style>
 </head>
-<body onclick="handleGlobalInteraction()" ontouchstart="handleGlobalInteraction()" onscroll="handleGlobalInteraction()" ontouchmove="handleGlobalInteraction()">
+<body>
 
-<div id="hiddenAudioWrapper">
-  <video id="bgMusic" loop autoplay muted playsinline preload="auto">
-    <source src="music.mp3.mp4" type="video/mp4">
-  </video>
-</div>
+    <!-- Invitation Card Frame -->
+    <div class="invitation-slider">
+        <!-- Card 1: Temple Theme Cover -->
+        <div class="slide-item">
+            <img src="image_w6JIXe.png" alt="Traditional Temple Cover Graphic">
+        </div>
+        
+        <!-- Card 2: December 3rd - Maapillai Azhaippu -->
+        <div class="slide-item">
+            <img src="image_Vp6zYa.png" alt="Maapillai Azhaippu Event Card">
+        </div>
 
-<div id="gateScreen" class="gate-overlay">
-  <div class="gate left-gate" id="leftGate"><div class="gate-half"></div></div>
-  <div class="gate right-gate" id="rightGate"><div class="gate-half"></div></div>
-</div>
+        <!-- Card 3: December 4th - Main Muhurtham Wedding -->
+        <div class="slide-item">
+            <img src="image_U3jU8C.png" alt="Main Wedding Invitation Card">
+        </div>
 
-<div class="screen" id="sliderScreen">
-  <div class="slides-container">
-    <div class="slide active" id="slide1" style="background-image: url('maapillai.png');"></div>
-    <div class="slide" id="slide2" style="background-image: url('marriage.png');"></div>
-  </div>
-</div>
+        <!-- Navigation Controls -->
+        <div class="slider-controls">
+            <button class="control-btn" id="backwardBtn" onclick="navigateSlides(-1)">◀ Back</button>
+            <button class="control-btn" id="playPauseBtn" onclick="toggleAutoplay()">⏸ Pause</button>
+            <button class="control-btn" id="forwardBtn" onclick="navigateSlides(1)">Next ▶</button>
+        </div>
+    </div>
 
-<div class="screen" id="rsvpScreen">
-  <div class="title">Rishita &amp; Adithya</div>
-  <a href="https://withjoy.com/rishitadithya/rsvp" target="_blank" rel="noopener noreferrer" class="rsvp-btn">RSVP</a>
-  <div class="rsvp-caption">Please RSVP to help us plan our celebrations</div>
-  <button class="replay-link" onclick="restartInvitation(event)">View Invitation Again</button>
-</div>
+    <!-- RSVP Link Section -->
+    <div class="rsvp-footer">
+        <a href="https://withjoy.com/rishitadithya/rsvp" target="_blank" class="rsvp-link-btn">
+            Click Here to RSVP
+        </a>
+    </div>
 
-<div class="nav-controls" id="navControls">
-  <button class="nav-btn" id="prevBtn" aria-label="Previous">&#8249;</button>
-  <button class="nav-btn" id="pauseBtn" aria-label="Pause">&#10073;&#10073;</button>
-  <button class="nav-btn" id="nextBtn" aria-label="Next">&#8250;</button>
-</div>
-<script>
-  const slides = document.querySelectorAll('.slide');
-  let currentIdx = 0, slideInterval = null, hasInteracted = false, gateOpened = false, isPaused = false;
-  const slideDuration = 15000;
-  const audio = document.getElementById('bgMusic');
-  let fadeTimeoutId = null;
-  const navControls = document.getElementById('navControls');
-  const pauseBtn = document.getElementById('pauseBtn');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
+    <!-- Control Operations & Autoplay Logic -->
+    <script>
+        let currentSlide = 0;
+        let autoplayTimer;
+        let isAutoplayActive = true;
+        const slideDuration = 4000; // Changes card every 4 seconds
 
-  function handleGlobalInteraction() {
-    if (hasInteracted) return;
-    hasInteracted = true;
-    audio.muted = false;
-    audio.currentTime = 110;
-    audio.play().catch(e => {
-      hasInteracted = false;
-      console.log("Audio waiting for system touch gesture:", e);
-    });
-  }
+        const allSlides = document.getElementsByClassName("slide-item");
+        const playPauseButton = document.getElementById("playPauseBtn");
 
-  window.addEventListener('DOMContentLoaded', () => {
-    audio.muted = false;
-    audio.play().then(() => { 
-      audio.currentTime = 110;
-      hasInteracted = true; 
-    }).catch(() => {
-      audio.muted = true;
-      audio.currentTime = 110;
-      audio.play().catch(() => {});
-    });
+        function renderSlide() {
+            // Hide all cards
+            for (let i = 0; i < allSlides.length; i++) {
+                allSlides[i].style.display = "none";  
+            }
+            // Loop check boundaries
+            if (currentSlide >= allSlides.length) { currentSlide = 0; }
+            if (currentSlide < 0) { currentSlide = allSlides.length - 1; }
+            
+            // Display active card
+            allSlides[currentSlide].style.display = "block";  
+        }
 
-    setTimeout(() => {
-      gateOpened = true;
-      document.getElementById('gateScreen').classList.add('open');
-      setTimeout(() => {
-        document.getElementById('gateScreen').style.display = 'none';
-        navControls.style.display = 'flex';
-        startTimer();
-      }, 1200);
-    }, 5000); 
-  });
+        function triggerNextSlide() {
+            currentSlide++;
+            renderSlide();
+        }
 
-  function startTimer() {
-    clearInterval(slideInterval);
-    if (gateOpened && !isPaused) { slideInterval = setInterval(nextSlide, slideDuration); }
-  }
+        function startAutoplay() {
+            autoplayTimer = setInterval(triggerNextSlide, slideDuration);
+        }
 
-  function showSlide(index) {
-    slides[currentIdx].classList.remove('active'); currentIdx = index;
-    if (currentIdx >= slides.length) {
-      clearInterval(slideInterval);
-      document.getElementById('sliderScreen').style.display = 'none';
-      document.getElementById('rsvpScreen').style.display = 'flex';
-      navControls.style.display = 'none';
-      triggerUniversalAudioStopEngine();
-    } else {
-      slides[currentIdx].classList.add('active');
-      startTimer();
-    }
-  }
+        function clearAutoplay() {
+            clearInterval(autoplayTimer);
+        }
 
-  function triggerUniversalAudioStopEngine() {
-    clearTimeout(fadeTimeoutId);
-    fadeTimeoutId = setTimeout(() => {
-      audio.pause();
-      audio.currentTime = 110;
-    }, 5000);
-  }
+        function navigateSlides(direction) {
+            clearAutoplay();
+            currentSlide += direction;
+            renderSlide();
+            if (isAutoplayActive) {
+                startAutoplay();
+            }
+        }
 
-  function nextSlide() { showSlide(currentIdx + 1); }
+        function toggleAutoplay() {
+            if (isAutoplayActive) {
+                clearAutoplay();
+                playPauseButton.innerHTML = "▶ Play";
+                isAutoplayActive = false;
+            } else {
+                currentSlide++;
+                renderSlide();
+                startAutoplay();
+                playPauseButton.innerHTML = "⏸ Pause";
+                isAutoplayActive = true;
+            }
+        }
 
-  prevBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (currentIdx > 0) { showSlide(currentIdx - 1); }
-  });
+        // Initialize execution on load
+        renderSlide();
+        startAutoplay();
+    </script>
 
-  nextBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    showSlide(currentIdx + 1);
-  });
-
-  pauseBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    isPaused = !isPaused;
-    if (isPaused) {
-      clearInterval(slideInterval);
-      pauseBtn.innerHTML = '&#9658;';
-      pauseBtn.setAttribute('aria-label', 'Play');
-    } else {
-      startTimer();
-      pauseBtn.innerHTML = '&#10073;&#10073;';
-      pauseBtn.setAttribute('aria-label', 'Pause');
-    }
-  });
-
-  function restartInvitation(e) {
-    if(e) e.stopPropagation();
-    clearTimeout(fadeTimeoutId);
-    audio.pause();
-    audio.muted = false;
-    
-    document.getElementById('rsvpScreen').style.display = 'none';
-    document.getElementById('sliderScreen').style.display = 'flex';
-    document.getElementById('gateScreen').style.display = 'flex';
-    document.getElementById('gateScreen').classList.remove('open');
-    navControls.style.display = 'none';
-    isPaused = false;
-    pauseBtn.innerHTML = '&#10073;&#10073;';
-    pauseBtn.setAttribute('aria-label', 'Pause');
-    gateOpened = false; currentIdx = 0; hasInteracted = false;
-    
-    slides.forEach(s => s.classList.remove('active'));
-    slides[0].classList.add('active');
-    
-    audio.play().then(() => {
-      audio.currentTime = 110;
-      hasInteracted = true;
-    }).catch(() => {});
-    
-    setTimeout(() => {
-      gateOpened = true;
-      document.getElementById('gateScreen').classList.add('open');
-      setTimeout(() => {
-        document.getElementById('gateScreen').style.display = 'none';
-        navControls.style.display = 'flex';
-        startTimer();
-      }, 1200);
-    }, 5000);
-  }
-</script>
 </body>
 </html>
