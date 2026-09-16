@@ -278,7 +278,7 @@
             </div>
             
             <div style="margin-top: 30px;">
-                <button class="replay-action-btn" style="background: #666;" onclick="triggerAutoOpenReset()">View Invitation Again</button>
+                <button class="replay-action-btn" style="background: #666;" onclick="triggerInlineReplayLoop(event)">View Invitation Again</button>
             </div>
         </div>
 
@@ -307,28 +307,6 @@
     let isTrackPlaying = false;
     let autoTransitionTimer = null;
     let replayTimer = null;
-
-    // Checks local session memory state to determine if gate should auto-open on load
-    window.addEventListener('DOMContentLoaded', () => {
-        if (sessionStorage.getItem('autoOpenTemple') === 'true') {
-            sessionStorage.removeItem('autoOpenTemple'); // Clean state tracking
-            
-            // 1. Forcefully hide prompt text and animated arrows completely
-            if (indicatorPromptGroup) {
-                indicatorPromptGroup.classList.add('hide-indicators');
-            }
-            
-            // 2. Restart track playback explicitly from the very beginning timestamp
-            audioTrack.currentTime = 0;
-            startAudioStream();
-            
-            // 3. Lock doors shut for exactly 5 seconds, then fire the transition open automatically
-            replayTimer = setTimeout(() => {
-                gateOverlay.classList.add('is-open');
-                startAutoTransitionLoop();
-            }, 5000);
-        }
-    });
 
     // Opens curtain panels gracefully on manual guest click engagement
     function executeGateOpening() {
@@ -371,7 +349,7 @@
         if (autoTransitionTimer === null) {
             autoTransitionTimer = setInterval(() => {
                 navigateSlide(1); 
-            }, 20000); // 20 seconds for standard card rotation loop
+            }, 20000); 
         }
     }
 
@@ -382,6 +360,47 @@
             autoTransitionTimer = null;
             startAutoTransitionLoop();
         }
+    }
+
+    // State Reset Loop Engine: Bypasses browser reload limitations to keep unmuted audio working
+    function triggerInlineReplayLoop(event) {
+        if(event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        // 1. Wipe out active loop transition timers
+        if (autoTransitionTimer !== null) {
+            clearInterval(autoTransitionTimer);
+            autoTransitionTimer = null;
+        }
+        if (replayTimer !== null) {
+            clearTimeout(replayTimer);
+            replayTimer = null;
+        }
+
+        // 2. Instantly reset slideshow screens back to Slide 0
+        for (let i = 0; i < totalSlidesCount; i++) {
+            document.getElementById(`slide${i}`).classList.remove('active-slide');
+        }
+        currentSlideIndex = 0;
+        document.getElementById('slide0').classList.add('active-slide');
+
+        // 3. Snap temple overlay doors shut and completely hide "Tap to Enter" prompts/arrows
+        gateOverlay.classList.remove('is-open');
+        if (indicatorPromptGroup) {
+            indicatorPromptGroup.classList.add('hide-indicators');
+        }
+
+        // 4. Force audio track back to the exact start (0:00) and keep playing smoothly
+        audioTrack.currentTime = 0;
+        startAudioStream();
+
+        // 5. Stand closed for exactly 5 seconds, then transition split-open automatically
+        replayTimer = setTimeout(() => {
+            gateOverlay.classList.add('is-open');
+            startAutoTransitionLoop();
+        }, 5000);
     }
 
     // High-Force Device-Agnostic Redirection Matrix
@@ -416,15 +435,6 @@
             window.location.replace(rsvpTargetUrl);
             window.location.href = rsvpTargetUrl;
         }, 100);
-    }
-
-    // Stores auto-open command to state registry and drops browser page frame refresh
-    function triggerAutoOpenReset() {
-        if (autoTransitionTimer !== null) clearInterval(autoTransitionTimer);
-        if (replayTimer !== null) clearTimeout(replayTimer);
-        
-        sessionStorage.setItem('autoOpenTemple', 'true');
-        window.location.reload();
     }
 
     /* Background Playback Engine Stream Controls */
