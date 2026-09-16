@@ -114,13 +114,12 @@
             align-items: center;
             gap: 30px;
             z-index: 100;
-            background: transparent; /* Removed solid white backdrop panel */
+            background: transparent;
             padding: 0;
             border: none;
             transition: opacity 0.3s ease;
         }
         .control-btn {
-            /* 70% Semi-transparent background lets your text/images show cleanly underneath */
             background-color: rgba(61, 90, 69, 0.3); 
             color: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -136,7 +135,7 @@
             justify-content: center;
             -webkit-appearance: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            backdrop-filter: blur(3px); /* Gentle blur softens the underlying background pixels */
+            backdrop-filter: blur(3px);
             -webkit-backdrop-filter: blur(3px);
             transition: background-color 0.2s ease, transform 0.1s ease;
         }
@@ -180,11 +179,11 @@
                 <h1 class="rsvp-names">Rishita & Adithya</h1>
                 
                 <!-- Hardcoded RSVP Tracking Anchor Link Configuration -->
-                <a href="https://withjoy.com/rishitadithya/rsvp?utm_medium=web&utm_source=guest_site_nav&utm_campaign=nav_menu_rsvp" 
+                <a href="https://withjoy.com" 
                    target="_blank" 
                    rel="noopener noreferrer" 
                    class="rsvp-link-btn" 
-                   onclick="window.open('https://withjoy.com/rishitadithya/rsvp?utm_medium=web&utm_source=guest_site_nav&utm_campaign=nav_menu_rsvp', '_blank'); return false;">
+                   onclick="window.open('https://withjoy.com', '_blank'); return false;">
                     RSVP
                 </a>
                 
@@ -204,7 +203,7 @@
     <script>
         let currentSlide = 0;
         let autoplayTimer;
-        let musicTimeout;
+        let fadeInterval;
         let isAutoplayActive = true;
         let isFirstLaunch = true; /* Lock initial Temple screen behavior */
         const slideDuration = 4000; 
@@ -233,18 +232,40 @@
                 controlsToolbar.style.display = "flex";
             }
 
-            /* Stop music on RSVP page after 5 seconds */
-            clearTimeout(musicTimeout);
+            /* Smooth audio fade-out over 5 seconds on the RSVP page */
+            clearInterval(fadeInterval);
             if (currentSlide === 3) {
                 clearAutoplay(); 
-                
-                musicTimeout = setTimeout(function() {
-                    if (music && !music.paused) {
-                        music.pause();
-                        playPauseButton.innerHTML = "▶";
-                    }
-                }, 5000);
+                fadeOutAudio(5000); // 5000 milliseconds = 5 seconds total fade time
             }
+        }
+
+        /* Smooth linear fade audio utility engine */
+        function fadeOutAudio(duration) {
+            if (!music || music.paused) return;
+            
+            const startVolume = 1.0;
+            music.volume = startVolume;
+            
+            const fadeSteps = 50; // Updates volume every 100ms over 5 seconds
+            const stepTime = duration / fadeSteps;
+            const volumeDecreasePerStep = startVolume / fadeSteps;
+            
+            let currentStep = 0;
+            
+            fadeInterval = setInterval(function() {
+                currentStep++;
+                let newVolume = startVolume - (volumeDecreasePerStep * currentStep);
+                
+                if (newVolume <= 0) {
+                    clearInterval(fadeInterval);
+                    music.pause();
+                    music.volume = 1.0; // Reset internal track volume ceiling back to max for replay use
+                    playPauseButton.innerHTML = "▶";
+                } else {
+                    music.volume = newVolume;
+                }
+            }, stepTime);
         }
 
         /* Triggered when tapping anywhere on Temple Card Cover */
@@ -253,6 +274,7 @@
                 isFirstLaunch = false;
                 isAutoplayActive = true;
                 playPauseButton.innerHTML = "⏸";
+                if (music) music.volume = 1.0;
                 kickstartAudio();
                 triggerNextSlide();
                 startAutoplay();
@@ -276,6 +298,8 @@
 
         function navigateSlides(direction) {
             clearAutoplay();
+            clearInterval(fadeInterval);
+            if (music) music.volume = 1.0; // Instantly restore full volume during manually forced steps
             kickstartAudio();
             currentSlide += direction;
             renderSlide();
@@ -287,12 +311,14 @@
         function toggleAutoplay() {
             if (isAutoplayActive) {
                 clearAutoplay();
+                clearInterval(fadeInterval);
                 if (music) music.pause();
                 playPauseButton.innerHTML = "▶";
                 isAutoplayActive = false;
             } else {
                 isAutoplayActive = true;
                 playPauseButton.innerHTML = "⏸";
+                if (music) music.volume = 1.0;
                 if (music && currentSlide !== 3) {
                     music.play().catch(err => console.log("Audio resume caught"));
                 }
@@ -305,12 +331,14 @@
 
         function restartSlideshow() {
             clearAutoplay();
+            clearInterval(fadeInterval);
             currentSlide = 0;
             isFirstLaunch = true; /* Reset lock until clicked */
             isAutoplayActive = true;
             playPauseButton.innerHTML = "⏸";
             renderSlide();
             if (music) {
+                music.volume = 1.0;
                 music.currentTime = 0;
                 music.play().catch(err => console.log("Audio reset caught"));
             }
