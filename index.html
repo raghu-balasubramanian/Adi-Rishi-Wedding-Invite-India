@@ -86,27 +86,45 @@
             pointer-events: none;
         }
 
-        /* Tap Prompt Badge graphic */
+        /* Intuitive Moving Arrow Indicator Group */
         .tap-prompt-banner {
             position: absolute;
-            bottom: 14%;
+            bottom: 12%;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid #d4af37;
-            padding: 12px 34px;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-            color: #8b0000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-            animation: bouncePrompt 2.5s infinite;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             pointer-events: none;
             text-align: center;
             z-index: 1010;
+            transition: opacity 0.4s ease;
         }
         .temple-gate-overlay.is-open .tap-prompt-banner { opacity: 0; }
+
+        /* Animated Arrow Core pointing upward toward the gate center */
+        .animated-arrow {
+            font-size: 2.2rem;
+            color: #d4af37;
+            text-shadow: 0 2px 10px rgba(139, 0, 0, 0.4);
+            line-height: 1;
+            animation: arrowGlideUp 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Accompanying descriptive action text badge */
+        .tap-text-badge {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #d4af37;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            color: #8b0000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+            margin-top: 5px;
+        }
 
         /* Isolated Presentation Slideshow Architecture */
         .slides-viewport {
@@ -197,9 +215,19 @@
             cursor: pointer;
         }
 
-        @keyframes bouncePrompt {
-            0%, 100% { transform: translateX(-50%) scale(1); }
-            50% { transform: translateX(-50%) translateY(-4px) scale(1.02); }
+        /* Glides the arrow upward and fades it out to prompt clicking the gate */
+        @keyframes arrowGlideUp {
+            0% {
+                transform: translateY(10px);
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-15px);
+                opacity: 0;
+            }
         }
     </style>
 </head>
@@ -215,7 +243,10 @@
         <div class="gate-door-panel right">
             <img src="temple.png" alt="Temple Cover Right">
         </div>
-        <div class="tap-prompt-banner">▲<br>Tap to Enter</div>
+        <div class="tap-prompt-banner">
+            <div class="animated-arrow">▲</div>
+            <div class="tap-text-badge">TAP TO ENTER</div>
+        </div>
     </div>
 
     <!-- MAIN INTERACTIVE SLIDESHOW FRAMES -->
