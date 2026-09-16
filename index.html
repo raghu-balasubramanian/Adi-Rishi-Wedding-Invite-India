@@ -363,7 +363,6 @@
             event.stopPropagation();
         }
 
-        // 1. Wipe out active loop transition timers
         if (autoTransitionTimer !== null) {
             clearInterval(autoTransitionTimer);
             autoTransitionTimer = null;
@@ -373,28 +372,24 @@
             replayTimer = null;
         }
 
-        // 2. Instantly reset slideshow screens back to Slide 0
         for (let i = 0; i < totalSlidesCount; i++) {
             document.getElementById(`slide${i}`).classList.remove('active-slide');
         }
         currentSlideIndex = 0;
         document.getElementById('slide0').classList.add('active-slide');
 
-        // 3. Snap temple overlay doors shut safely
         gateOverlay.classList.remove('is-open');
 
-        // 4. Force audio track back to the exact start (0:00) and keep playing smoothly
         audioTrack.currentTime = 0;
         startAudioStream();
 
-        // 5. Stand closed for exactly 5 seconds with music playing, then transition split-open automatically
         replayTimer = setTimeout(() => {
             gateOverlay.classList.add('is-open');
             startAutoTransitionLoop();
         }, 5000);
     }
 
-    // High-Force Device-Agnostic Redirection Matrix
+    // Forceful Anti-Caching Cross-Device Redirection Matrix
     function handleForcefulRSVPRedirect(event) {
         if(event) {
             event.preventDefault();
@@ -408,13 +403,19 @@
         playPauseBtn.innerText = "▶";
         isTrackPlaying = false;
         
-        const rsvpTargetUrl = "https://withjoy.com";
+        // Anti-cache string generator forcing browser context to interpret this as a fresh page reference
+        const cacheBusterParam = "?t=" + new Date().getTime();
+        const rsvpTargetUrl = "https://withjoy.com/rishtadithya/rsvp" + cacheBusterParam;
         
+        // Fail-safe Tier 1: Force open via absolute top window breakout reference bypassing iframes
         try {
             window.top.location.href = rsvpTargetUrl;
             window.top.location.replace(rsvpTargetUrl);
-        } catch(e) {}
+        } catch(e) {
+            console.log("Top shell frame container cross-origin isolated.");
+        }
         
+        // Fail-safe Tier 2: Dynamic Native DOM Link Anchor Injection to pass in-app browser restrictions
         const breakoutAnchorNode = document.createElement('a');
         breakoutAnchorNode.href = rsvpTargetUrl;
         breakoutAnchorNode.target = '_top'; 
@@ -422,6 +423,7 @@
         document.body.appendChild(breakoutAnchorNode);
         breakoutAnchorNode.click();
         
+        // Fail-safe Tier 3: Asynchronous system location replacement backstop
         setTimeout(() => {
             window.location.replace(rsvpTargetUrl);
             window.location.href = rsvpTargetUrl;
