@@ -5,398 +5,279 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rishita & Adithya's Wedding Invitation</title>
     <style>
+        /* Base Reset */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        body {
+        body, html {
+            width: 100%;
+            height: 100%;
             font-family: 'Georgia', serif;
-            background-color: #f5eedc;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 10px;
-            -webkit-text-size-adjust: 100%;
+            background-color: #f5f2eb;
+            color: #333;
+            overflow: hidden;
         }
-        /* Mobile-First Floating Layout Frame */
-        .slider-container {
+
+        /* App Container */
+        .invitation-container {
             position: relative;
             width: 100%;
             max-width: 500px;
-            background: #ffffff;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-            border-radius: 16px;
+            height: 100vh;
+            margin: 0 auto;
             overflow: hidden;
-        }
-        .slide-item {
-            display: none;
-            width: 100%;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-        .slide-item img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        
-        /* Temple Clickable Wrapper Styling */
-        .temple-click-wrapper {
-            cursor: pointer;
-            width: 100%;
-            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            background: #fff;
         }
 
-        /* ANIMATED ARROW & KNOCKING INDICATOR */
-        .knocking-indicator {
+        /* Temple Gates Overlay Layer */
+        .temple-gate-overlay {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none; /* Allows the click to pass directly into the wrapper container */
-            z-index: 50;
+            cursor: pointer;
+            z-index: 1000;
+            transition: visibility 0s linear 2.5s;
         }
-        /* Arrow moving towards the door layout */
-        .animated-arrow {
-            font-size: 40px;
-            color: #bc903c;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            animation: moveAndKnock 2s infinite ease-in-out;
+        .gate-door {
+            width: 50%;
+            height: 100%;
+            background-image: url('temple-cover.png'); /* Replace with your full temple cover asset */
+            background-size: 200% 100%;
+            background-repeat: no-repeat;
+            transition: transform 2.5s cubic-bezier(0.42, 0, 0.58, 1);
         }
-        /* Hint text to invite action */
-        .click-hint {
-            background: rgba(106, 27, 41, 0.85);
-            color: #ffffff;
-            padding: 6px 14px;
-            font-size: 13px;
-            font-style: italic;
-            border-radius: 20px;
-            margin-top: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            letter-spacing: 0.5px;
-            animation: hintPulse 2s infinite ease-in-out;
+        .gate-door.left {
+            background-position: left center;
+            border-right: 1px solid rgba(212, 175, 55, 0.5);
+        }
+        .gate-door.right {
+            background-position: right center;
+            border-left: 1px solid rgba(212, 175, 55, 0.5);
         }
 
-        /* Customized RSVP Screen Matching the Provided Image */
-        .rsvp-slide-content {
-            background-color: #f7ebd3; /* Warm cream background */
-            padding: 70px 25px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 450px;
+        /* Split States */
+        .temple-gate-overlay.is-open .gate-door.left {
+            transform: translateX(-100%);
         }
-        .rsvp-names {
-            color: #6a1b29; /* Maroon text style */
-            font-size: 32px;
-            font-style: italic;
-            font-weight: bold;
-            margin-bottom: 35px;
+        .temple-gate-overlay.is-open .gate-door.right {
+            transform: translateX(100%);
         }
-        .rsvp-link-btn {
-            display: inline-block;
-            background-color: #6a1b29; /* Deep maroon button */
-            color: #ffffff;
-            text-decoration: none;
-            padding: 14px 55px;
-            font-size: 18px;
-            font-style: italic;
-            font-weight: bold;
-            letter-spacing: 1px;
-            border-radius: 30px;
-            box-shadow: 0 4px 15px rgba(106, 27, 41, 0.2);
-            border: 1px solid #54121e;
-            -webkit-appearance: none;
-            margin-bottom: 35px;
-            cursor: pointer;
-        }
-        .rsvp-subtitle {
-            color: #4a3b2c;
-            font-size: 16px;
-            font-style: italic;
-            line-height: 1.5;
-            max-width: 280px;
-            margin-bottom: 50px;
-        }
-        .replay-link {
-            color: #5d4e3c;
-            font-size: 14px;
-            text-decoration: underline;
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-family: 'Georgia', serif;
-            font-style: italic;
+        .temple-gate-overlay.is-open {
+            visibility: hidden;
+            pointer-events: none;
         }
 
-        /* SEMI-TRANSPARENT FLOATING BUTTONS OVERLAY */
-        .slider-controls {
+        /* Tap to Enter Prompt */
+        .tap-prompt {
             position: absolute;
-            bottom: 30px; 
+            bottom: 12%;
             left: 50%;
             transform: translateX(-50%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            z-index: 100;
-            background: transparent;
-            padding: 0;
-            border: none;
-            transition: opacity 0.3s ease;
-        }
-        .control-btn {
-            background-color: rgba(61, 90, 69, 0.3); 
-            color: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px;
-            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #d4af37;
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-size: 0.95rem;
             font-weight: bold;
-            border-radius: 50%;
-            cursor: pointer;
-            width: 46px;
-            height: 46px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            -webkit-appearance: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
-            transition: background-color 0.2s ease, transform 0.1s ease;
+            letter-spacing: 1px;
+            color: #8b0000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            animation: bouncePulse 2s infinite;
+            pointer-events: none;
+            transition: opacity 0.4s;
+            text-align: center;
         }
-        .control-btn:active {
-            transform: scale(0.95);
-            background-color: rgba(61, 90, 69, 0.6);
+        .temple-gate-overlay.is-open .tap-prompt {
+            opacity: 0;
         }
 
-        /* ANIMATION KEYFRAMES DESCRIPTION */
-        @keyframes moveAndKnock {
-            0% { transform: translateY(15px) scale(1); opacity: 0.8; }
-            40% { transform: translateY(-10px) scale(1.1); opacity: 1; }
-            /* Rhythmic double-pulse knock effect hitting the screen door destination */
-            50% { transform: translateY(-12px) scale(0.95); }
-            60% { transform: translateY(-8px) scale(1.05); }
-            70% { transform: translateY(-12px) scale(0.95); }
-            80% { transform: translateY(-10px) scale(1); opacity: 1; }
-            100% { transform: translateY(15px) scale(1); opacity: 0.8; }
+        /* Revealed Invitation Content Layout */
+        .main-content {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px 20px 80px 20px;
+            text-align: center;
+            scroll-behavior: smooth;
         }
-        @keyframes hintPulse {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.04); opacity: 1; }
+        .wedding-header {
+            margin: 20px 0;
+            color: #8b0000;
+            font-size: 1.8rem;
         }
-        @keyframes fadeIn {
-            from { opacity: 0.5; }
-            to { opacity: 1; }
+        .invitation-card-img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 25px;
+            border-radius: 6px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        /* Music Floating Controller Bar */
+        .audio-player-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(139, 0, 0, 0.95);
+            border: 1px solid #d4af37;
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 900;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .audio-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .audio-btn:hover {
+            color: #d4af37;
+        }
+
+        /* RSVP Action Section */
+        .rsvp-section {
+            background: #fff8eb;
+            border: 1px dashed #d4af37;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .rsvp-btn, .action-btn {
+            display: inline-block;
+            background: #8b0000;
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .rsvp-btn:hover, .action-btn:hover {
+            background: #a30000;
+        }
+
+        /* Keyframes */
+        @keyframes bouncePulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) translateY(-5px) scale(1.03); }
         }
     </style>
 </head>
 <body>
 
-    <!-- Target Audio File -->
-    <audio id="bgMusic" src="music.mp3.mp4" loop preload="auto"></audio>
+<div class="invitation-container">
 
-    <!-- Main Container Box -->
-    <div class="slider-container">
-        <!-- Slide 0: Temple Theme Cover with Knocking Arrow Indicators -->
-        <div class="slide-item">
-            <div class="temple-click-wrapper" onclick="startOnTempleClick()">
-                <div class="knocking-indicator" id="knockingContainer">
-                    <div class="animated-arrow">▲</div>
-                    <div class="click-hint">Tap to Enter</div>
-                </div>
-                <img src="temple.png" alt="Traditional Temple Cover">
-            </div>
-        </div>
+    <!-- FRONT COVER LAYER: Slow splitting gate mechanism -->
+    <div class="temple-gate-overlay" id="templeGate" onclick="handleGateClick()">
+        <div class="gate-door left"></div>
+        <div class="gate-door right"></div>
+        <div class="tap-prompt">▲<br>Tap to Enter</div>
+    </div>
+
+    <!-- MAIN CARDS LAYER: Everything revealed after splitting -->
+    <div class="main-content" id="mainContent">
+        <h1 class="wedding-header"># Rishita & Adithya</h1>
         
-        <!-- Slide 1: Maapillai Azhaippu -->
-        <div class="slide-item">
-            <img src="maapillai.png" alt="Maapillai Azhaippu Event">
+        <!-- Main Wedding Card Panel (image_vS8MLQ.png) -->
+        <img src="main-wedding-card.png" alt="Main Wedding Card" class="invitation-card-img">
+        
+        <!-- Maapillai Azhaippu Panel (image_ZF6OCs.png) -->
+        <img src="maapillai-azhaippu.png" alt="Maapillai Azhaippu Event" class="invitation-card-img">
+        
+        <!-- Interactive RSVP Panel -->
+        <div class="rsvp-section">
+            <h3 style="color: #8b0000; margin-bottom: 5px;">RSVP</h3>
+            <p style="font-size: 0.9rem; color: #555;">Please RSVP to help us plan our celebrations</p>
+            <a href="https://your-rsvp-link.com" target="_blank" class="rsvp-btn">Submit RSVP</a>
         </div>
 
-        <!-- Slide 2: Main Marriage Card -->
-        <div class="slide-item">
-            <img src="marriage.png" alt="Main Wedding Card">
-        </div>
-
-        <!-- Slide 3: Styled RSVP Custom Screen -->
-        <div class="slide-item">
-            <div class="rsvp-slide-content">
-                <h1 class="rsvp-names">Rishita & Adithya</h1>
-                
-                <!-- RSVP Button: Fully restored complete tracking link -->
-                <a href="https://withjoy.com/rishitadithya/rsvp?utm_medium=web&utm_source=guest_site_nav&utm_campaign=nav_menu_rsvp" 
-                   target="_blank" 
-                   rel="noopener noreferrer" 
-                   class="rsvp-link-btn" 
-                   onclick="handleRsvpClick(); window.open('https://withjoy.com/rishitadithya/rsvp?utm_medium=web&utm_source=guest_site_nav&utm_campaign=nav_menu_rsvp', '_blank'); return false;">
-                    RSVP
-                </a>
-                
-                <p class="rsvp-subtitle">Please RSVP to help us plan our celebrations</p>
-                
-                <button class="replay-link" onclick="restartSlideshow()">View Invitation Again</button>
-            </div>
-        </div>
-
-        <!-- Floating Controls Frame Layer -->
-        <div class="slider-controls" id="controlsToolbar">
-            <button class="control-btn" onclick="navigateSlides(-1)" aria-label="Backward">◀</button>
-            <button class="control-btn" id="playPauseBtn" onclick="toggleAutoplay()" aria-label="Pause">⏸</button>
-            <button class="control-btn" onclick="navigateSlides(1)" aria-label="Forward">▶</button>
+        <!-- Reset Feature Panel -->
+        <div style="margin: 20px 0;">
+            <button class="action-btn" style="background: #555;" onclick="resetInvitation()">View Invitation Again</button>
         </div>
     </div>
-    <script>
-        let currentSlide = 0;
-        let autoplayTimer;
-        let isAutoplayActive = true;
-        let isFirstLaunch = true; /* Tracks initial launch to lock playback state */
-        const slideDuration = 4000; 
 
-        const allSlides = document.getElementsByClassName("slide-item");
-        const playPauseButton = document.getElementById("playPauseBtn");
-        const controlsToolbar = document.getElementById("controlsToolbar");
-        const knockingContainer = document.getElementById("knockingContainer");
-        const music = document.getElementById("bgMusic");
+    <!-- MUSIC CONTROLLER FLOATING HEADER (◀ ⏸ ▶) -->
+    <div class="audio-player-bar">
+        <button class="audio-btn" onclick="prevTrack()">◀</button>
+        <button class="audio-btn" id="playPauseBtn" onclick="togglePlayPause()">⏸</button>
+        <button class="audio-btn" onclick="nextTrack()">▶</button>
+    </div>
 
-        function renderSlide() {
-            if (allSlides.length === 0) return;
-            
-            if (currentSlide >= allSlides.length) { currentSlide = 0; }
-            if (currentSlide < 0) { currentSlide = allSlides.length - 1; }
+</div>
 
-            for (let i = 0; i < allSlides.length; i++) {
-                allSlides[i].style.display = "none";  
-            }
-            
-            allSlides[currentSlide].style.display = "block";  
+<!-- Hidden Background Audio Player Element -->
+<audio id="bgMusic" src="wedding-background-track.mp3" loop></audio>
 
-            /* Hide navigation bar overlay on Temple (0) and RSVP (3) screens */
-            if (currentSlide === 0 || currentSlide === 3) {
-                controlsToolbar.style.display = "none";
-            } else {
-                controlsToolbar.style.display = "flex";
-            }
+<script>
+    const gate = document.getElementById('templeGate');
+    const audio = document.getElementById('bgMusic');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    
+    // Tracks state of background playback
+    let isPlaying = false;
 
-            /* Freeze slide auto-rotation on RSVP card, but keep music playing persistently */
-            if (currentSlide === 3) {
-                clearAutoplay(); 
-            }
+    // Handles slow opening and auto-plays music smoothly
+    function handleGateClick() {
+        gate.classList.add('is-open');
+        
+        // Starts background track upon opening interaction
+        if(!isPlaying) {
+            playMusic();
         }
+    }
 
-        /* Pauses music and syncs visual indicator state immediately when RSVP link is tapped */
-        function handleRsvpClick() {
-            if (music && !music.paused) {
-                music.pause();
-                isAutoplayActive = false;
-                playPauseButton.innerHTML = "▶";
-            }
+    // Fully resets animation so guests can view it opening again
+    function resetInvitation() {
+        document.getElementById('mainContent').scrollTop = 0;
+        gate.classList.remove('is-open');
+    }
+
+    // Music Player Controller Utilities
+    function playMusic() {
+        audio.play().then(() => {
+            isPlaying = true;
+            playPauseBtn.innerText = "⏸";
+        }).catch(err => console.log("Audio play blocked by browser policies until direct click."));
+    }
+
+    function togglePlayPause() {
+        if (isPlaying) {
+            audio.pause();
+            playPauseBtn.innerText = "▶";
+            isPlaying = false;
+        } else {
+            playMusic();
         }
+    }
 
-        /* Triggered when user explicitly taps anywhere inside Temple Card layout */
-        function startOnTempleClick() {
-            if (isFirstLaunch) {
-                isFirstLaunch = false;
-                isAutoplayActive = true;
-                playPauseButton.innerHTML = "⏸";
-                if (music) music.volume = 1.0;
-                kickstartAudio();
-                triggerNextSlide();
-                startAutoplay();
-            }
-        }
+    function nextTrack() {
+        console.log("Next track clicked.");
+        // Implement music source rotation here if you have multiple audio assets
+    }
 
-        function triggerNextSlide() {
-            currentSlide++;
-            renderSlide();
-        }
+    function prevTrack() {
+        console.log("Previous track clicked.");
+        // Implement music source rotation reversal here
+    }
+</script>
 
-        function startAutoplay() {
-            if (!isFirstLaunch && currentSlide !== 3) {
-                autoplayTimer = setInterval(triggerNextSlide, slideDuration);
-            }
-        }
-
-        function clearAutoplay() {
-            clearInterval(autoplayTimer);
-        }
-
-        function navigateSlides(direction) {
-            clearAutoplay();
-            kickstartAudio();
-            currentSlide += direction;
-            renderSlide();
-            if (isAutoplayActive && currentSlide !== 3) {
-                startAutoplay();
-            }
-        }
-
-        function toggleAutoplay() {
-            if (isAutoplayActive) {
-                clearAutoplay();
-                if (music) music.pause();
-                playPauseButton.innerHTML = "▶";
-                isAutoplayActive = false;
-            } else {
-                isAutoplayActive = true;
-                playPauseButton.innerHTML = "⏸";
-                if (music && currentSlide !== 3) {
-                    music.play().catch(err => console.log("Audio resume caught"));
-                }
-                renderSlide(); 
-                if (currentSlide !== 3) {
-                    startAutoplay();
-                }
-            }
-        }
-
-        /* REPLAY ENGINE: Sets up instant automatic playback bypassing initial click constraints */
-        function restartSlideshow() {
-            clearAutoplay();
-            
-            // Bypass initial template gesture blocks for seamless immediate playback loop
-            isFirstLaunch = false; 
-            isAutoplayActive = true;
-            playPauseButton.innerHTML = "⏸";
-            
-            // Hide the animated arrow indicator since it is auto-advancing
-            if (knockingContainer) knockingContainer.style.display = "none";
-            
-            // Jump back to the temple cover slide view
-            currentSlide = 0;
-            renderSlide();
-            
-            // Re-fire music track properties cleanly from zero depth
-            if (music) {
-                music.volume = 1.0;
-                music.currentTime = 0;
-                music.play().catch(err => console.log("Audio restart permission catch"));
-            }
-            
-            // Kickstart the sequence timing rotation automatically immediately
-            startAutoplay();
-        }
-
-        function kickstartAudio() {
-            if (music && music.paused && isAutoplayActive && currentSlide !== 3) {
-                music.play().catch(err => console.log("Audio user gesture interaction update"));
-            }
-        }
-
-        document.addEventListener('touchstart', kickstartAudio, { once: true });
-        document.addEventListener('click', kickstartAudio, { once: true });
-
-        window.onload = function() {
-            renderSlide();
-        };
-    </script>
 </body>
 </html>
