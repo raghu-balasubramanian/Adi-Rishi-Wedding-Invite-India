@@ -18,10 +18,10 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
             -webkit-text-size-adjust: 100%;
         }
-        /* Mobile-First Layout Frame */
+        /* Mobile-First Floating Layout Frame */
         .slider-container {
             position: relative;
             width: 100%;
@@ -41,6 +41,14 @@
             height: auto;
             display: block;
         }
+        
+        /* Temple Clickable Wrapper Styling */
+        .temple-click-wrapper {
+            cursor: pointer;
+            width: 100%;
+            position: relative;
+        }
+
         /* Customized RSVP Screen Matching the Provided Image */
         .rsvp-slide-content {
             background-color: #f7ebd3; /* Warm cream background */
@@ -94,32 +102,42 @@
             font-family: 'Georgia', serif;
             font-style: italic;
         }
-        /* Navigation Controls Toolbar */
+
+        /* FLOATING NAVIGATION CONTROLS OVERLAY */
         .slider-controls {
+            position: absolute;
+            bottom: 25px; /* Floats inside the graphic screen area */
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 25px;
-            padding: 16px;
-            background: #ffffff;
-            border-top: 1px solid #f0e9dc;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.35); /* Translucent frosted back glass styling */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 10px 20px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
             transition: opacity 0.3s ease;
         }
         .control-btn {
             background-color: #3d5a45;
             color: #ffffff;
             border: none;
-            padding: 12px;
-            font-size: 18px;
+            padding: 10px;
+            font-size: 16px;
             font-weight: bold;
             border-radius: 50%;
             cursor: pointer;
-            width: 50px;
-            height: 50px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             -webkit-appearance: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
         .control-btn:hover {
             background-color: #2b3f30;
@@ -139,7 +157,9 @@
     <div class="slider-container">
         <!-- Slide 0: Temple Theme Cover -->
         <div class="slide-item">
-            <img src="temple.png" alt="Traditional Temple Cover">
+            <div class="temple-click-wrapper" onclick="startOnTempleClick()">
+                <img src="temple.png" alt="Traditional Temple Cover">
+            </div>
         </div>
         
         <!-- Slide 1: Maapillai Azhaippu -->
@@ -157,12 +177,11 @@
             <div class="rsvp-slide-content">
                 <h1 class="rsvp-names">Rishita & Adithya</h1>
                 
-                <!-- RSVP Button with hardcoded destination link logic -->
-                <a href="https://withjoy.com/rishitadithya/rsvp" 
+                <a href="https://withjoy.com" 
                    target="_blank" 
                    rel="noopener noreferrer" 
                    class="rsvp-link-btn" 
-                   onclick="window.open('https://withjoy.com/rishitadithya/rsvp', '_blank'); return false;">
+                   onclick="window.open('https://withjoy.com', '_blank'); return false;">
                     RSVP
                 </a>
                 
@@ -172,19 +191,19 @@
             </div>
         </div>
 
-        <!-- Dynamic Controls Frame -->
+        <!-- Floating Controls Frame Layer -->
         <div class="slider-controls" id="controlsToolbar">
             <button class="control-btn" onclick="navigateSlides(-1)" aria-label="Backward">◀</button>
             <button class="control-btn" id="playPauseBtn" onclick="toggleAutoplay()" aria-label="Pause">⏸</button>
             <button class="control-btn" onclick="navigateSlides(1)" aria-label="Forward">▶</button>
         </div>
     </div>
-
     <script>
         let currentSlide = 0;
         let autoplayTimer;
         let musicTimeout;
         let isAutoplayActive = true;
+        let isFirstLaunch = true; /* Lock initial Temple screen behavior */
         const slideDuration = 4000; 
 
         const allSlides = document.getElementsByClassName("slide-item");
@@ -204,14 +223,14 @@
             
             allSlides[currentSlide].style.display = "block";  
 
-            // Hide toolbar on Temple (0) and RSVP (3)
+            /* Hide toolbar on Temple (0) and RSVP (3) */
             if (currentSlide === 0 || currentSlide === 3) {
                 controlsToolbar.style.display = "none";
             } else {
                 controlsToolbar.style.display = "flex";
             }
 
-            // Stop music on RSVP page after 5 seconds
+            /* Stop music on RSVP page after 5 seconds */
             clearTimeout(musicTimeout);
             if (currentSlide === 3) {
                 clearAutoplay(); 
@@ -225,13 +244,27 @@
             }
         }
 
+        /* Triggered when tapping anywhere on Temple Card Cover */
+        function startOnTempleClick() {
+            if (isFirstLaunch) {
+                isFirstLaunch = false;
+                isAutoplayActive = true;
+                playPauseButton.innerHTML = "⏸";
+                kickstartAudio();
+                triggerNextSlide();
+                startAutoplay();
+            }
+        }
+
         function triggerNextSlide() {
             currentSlide++;
             renderSlide();
         }
 
         function startAutoplay() {
-            autoplayTimer = setInterval(triggerNextSlide, slideDuration);
+            if (!isFirstLaunch && currentSlide !== 3) {
+                autoplayTimer = setInterval(triggerNextSlide, slideDuration);
+            }
         }
 
         function clearAutoplay() {
@@ -270,10 +303,10 @@
         function restartSlideshow() {
             clearAutoplay();
             currentSlide = 0;
+            isFirstLaunch = true; /* Reset lock until clicked */
             isAutoplayActive = true;
             playPauseButton.innerHTML = "⏸";
             renderSlide();
-            startAutoplay();
             if (music) {
                 music.currentTime = 0;
                 music.play().catch(err => console.log("Audio reset caught"));
@@ -291,9 +324,7 @@
 
         window.onload = function() {
             renderSlide();
-            startAutoplay();
         };
     </script>
-
 </body>
 </html>
