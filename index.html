@@ -236,8 +236,8 @@
             <div class="rsvp-card-block">
                 <h2 style="color: #8b0000; margin-bottom: 10px;">RSVP</h2>
                 <p style="font-size: 1rem; color: #666; line-height: 1.5;">Please RSVP to help us plan our celebrations</p>
-                <!-- Direct redirect straight to WithJoy RSVP Engine link context -->
-                <a href="https://withjoy.com" class="rsvp-action-link" onclick="handleRSVPSubmission(event)">Respond Here</a>
+                <!-- Target RSVP Form Link -->
+                <a href="https://withjoy.com/rishitadithya/rsvp" class="rsvp-action-link" onclick="handleRSVPSubmission(event)">Respond Here</a>
             </div>
             
             <div style="margin-top: 30px;">
@@ -301,17 +301,26 @@
         document.getElementById(`slide${currentSlideIndex}`).classList.add('active-slide');
     }
 
-    // Forceful Device-Agnostic RSVP Link Redirect & Music Killer
+    // Forceful Anti-Caching Cross-Device RSVP Router
     function handleRSVPSubmission(event) {
+        // Break standard execution chain immediately to clear cached thread context
         event.preventDefault();
+        event.stopPropagation();
         
-        // Kill music playback cleanly upon RSVP submit action
+        // Shut down background music streams immediately
         audioTrack.pause();
         playPauseBtn.innerText = "▶";
         isTrackPlaying = false;
         
-        // Enforce fallback location routing redirection across any user handset device
-        window.location.href = "https://withjoy.com";
+        const rsvpTargetUrl = "https://withjoy.com/rishitadithya/rsvp";
+        
+        // Multi-tier absolute redirection array forcing mobile web views to give up cached routing
+        setTimeout(() => {
+            window.top.location.replace(rsvpTargetUrl);
+            window.top.location.href = rsvpTargetUrl;
+            window.location.replace(rsvpTargetUrl);
+            window.location.href = rsvpTargetUrl;
+        }, 50);
     }
 
     // Stores auto-open command to state registry and drops browser page frame refresh
