@@ -102,12 +102,6 @@
             transition: opacity 0.4s ease;
         }
         .temple-gate-overlay.is-open .tap-prompt-banner { opacity: 0; }
-        
-        /* Force hides indicator when view-again auto loop runs */
-        .tap-prompt-banner.hide-indicators {
-            display: none !important;
-            opacity: 0 !important;
-        }
 
         /* Animated Arrow Core pointing upward toward the gate center */
         .animated-arrow {
@@ -386,17 +380,14 @@
         currentSlideIndex = 0;
         document.getElementById('slide0').classList.add('active-slide');
 
-        // 3. Snap temple overlay doors shut and completely hide "Tap to Enter" prompts/arrows
+        // 3. Snap temple overlay doors shut safely
         gateOverlay.classList.remove('is-open');
-        if (indicatorPromptGroup) {
-            indicatorPromptGroup.classList.add('hide-indicators');
-        }
 
         // 4. Force audio track back to the exact start (0:00) and keep playing smoothly
         audioTrack.currentTime = 0;
         startAudioStream();
 
-        // 5. Stand closed for exactly 5 seconds, then transition split-open automatically
+        // 5. Stand closed for exactly 5 seconds with music playing, then transition split-open automatically
         replayTimer = setTimeout(() => {
             gateOverlay.classList.add('is-open');
             startAutoTransitionLoop();
