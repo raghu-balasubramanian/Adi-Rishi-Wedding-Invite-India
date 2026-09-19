@@ -362,20 +362,31 @@
         }
         
         document.getElementById(`slide${currentSlideIndex}`).classList.add('active-slide');
+
+        // FORCE COUPLING SAFETY ENGINE: Freeze timer completely when arriving on the RSVP card (index 2)
+        if (currentSlideIndex === 2) {
+            if (autoTransitionTimer !== null) {
+                clearInterval(autoTransitionTimer);
+                autoTransitionTimer = null;
+            }
+        }
     }
 
     // Manual navigation handler that clears and restarts the 15-second timer countdown
     function manualNavigation(direction) {
         navigateSlide(direction);
-        resetAutoTransitionLoop();
+        // Only restart auto-rotation if the manual hop leaves us on an invitation image card slide
+        if (currentSlideIndex !== 2) {
+            resetAutoTransitionLoop();
+        }
     }
 
     // Starts the automated 15-second loop interval clock
     function startAutoTransitionLoop() {
-        if (autoTransitionTimer === null) {
+        if (autoTransitionTimer === null && currentSlideIndex !== 2) {
             autoTransitionTimer = setInterval(() => {
                 navigateSlide(1); 
-            }, 15000); // 15000 milliseconds = 15 seconds
+            }, 15000); 
         }
     }
 
@@ -384,18 +395,17 @@
         if (autoTransitionTimer !== null) {
             clearInterval(autoTransitionTimer);
             autoTransitionTimer = null;
-            startAutoTransitionLoop();
         }
+        startAutoTransitionLoop();
     }
 
-    // Pure State Reset Engine: Fixes the view-again sequence alignment and transitions
+    // State Reset Loop Engine: Restores the view-again sequence alignment
     function triggerInlineReplayLoop(event) {
         if(event) {
             event.preventDefault();
             event.stopPropagation();
         }
 
-        // 1. Instantly wipe out all active countdown loops to freeze state
         if (autoTransitionTimer !== null) {
             clearInterval(autoTransitionTimer);
             autoTransitionTimer = null;
@@ -405,38 +415,29 @@
             replayTimer = null;
         }
 
-        // 2. Hide translucent nav console bar immediately so it's not visible on the temple cover
         if (mediaConsoleHub) {
             mediaConsoleHub.classList.remove('visible-controls');
         }
 
-        // 3. Reset background slides behind the doors to Slide 0 (Maapillai) silently
         for (let i = 0; i < totalSlidesCount; i++) {
             document.getElementById(`slide${i}`).classList.remove('active-slide');
         }
         currentSlideIndex = 0;
         document.getElementById('slide0').classList.add('active-slide');
 
-        // 4. Force the temple overlay doors shut and completely hide "Tap to Enter" prompts/arrows
         gateOverlay.classList.remove('is-open');
         if (indicatorPromptGroup) {
             indicatorPromptGroup.classList.add('hide-indicators');
         }
 
-        // 5. Force audio track back to the exact start (0:00) and keep playing smoothly right away
         audioTrack.currentTime = 0;
         startAudioStream();
 
-        // 6. Lock the temple page on screen for EXACTLY 5 seconds with continuous music, then slide open automatically
         replayTimer = setTimeout(() => {
             gateOverlay.classList.add('is-open');
-            
-            // Show the translucent media bar console overlay over the newly revealed slide
             if (mediaConsoleHub) {
                 mediaConsoleHub.classList.add('visible-controls');
             }
-            
-            // Hand control over to the 15-second automatic sliding card loop
             startAutoTransitionLoop();
         }, 5000);
     }
@@ -455,8 +456,8 @@
         playPauseBtn.innerText = "▶";
         isTrackPlaying = false;
         
-        const antiCacheBusterKey = "?nocache=" + new Date().getTime() + "&force=true";
-        const rsvpTargetUrl = "https://withjoy.com" + antiCacheBusterKey;
+        const cacheBusterParam = "?t=" + new Date().getTime() + "&force=true";
+        const rsvpTargetUrl = "https://withjoy.com" + cacheBusterParam;
         
         try {
             window.top.location.href = rsvpTargetUrl;
@@ -473,7 +474,7 @@
         setTimeout(() => {
             window.location.replace(rsvpTargetUrl);
             window.location.href = rsvpTargetUrl;
-        }, 120);
+        }, 100);
     }
 
     /* Background Playback Engine Stream Controls */
