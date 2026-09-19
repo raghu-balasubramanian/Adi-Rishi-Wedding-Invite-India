@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Rishita & Adithya's Wedding Invitation</title>
     <style>
         /* Base Global Overrides */
@@ -13,7 +13,8 @@
         }
         body, html {
             width: 100%;
-            height: 100%;
+            height: 100dvh; /* Enforces absolute dynamically scaled Safari sizing boundary */
+            height: 100vh;
             font-family: 'Georgia', serif;
             background-color: #f6f4ee;
             overflow: hidden;
@@ -26,6 +27,7 @@
             position: relative;
             width: 100%;
             max-width: 500px;
+            height: 100dvh; /* Locked strictly inside active visible Safari mobile window */
             height: 100vh;
             margin: 0 auto;
             overflow: hidden;
@@ -88,7 +90,7 @@
         /* Intuitive Moving Arrow Indicator Group */
         .tap-prompt-banner {
             position: absolute;
-            bottom: 15%;
+            bottom: 18%; /* Shifted upward to prevent Safari panel clippings */
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -162,7 +164,7 @@
         .invitation-card-img {
             width: 100% !important;
             height: auto !important;
-            max-height: 100vh !important;
+            max-height: 90vh !important;
             object-fit: contain !important;
             display: block !important;
         }
@@ -197,7 +199,7 @@
         /* FLOATING TRANSLUCENT OVERLAY PLAYBACK NAVIGATION CONSOLE BAR */
         .audio-player-controls {
             position: absolute;
-            bottom: 30px;
+            bottom: 40px; /* Elevated to completely avoid Safari layout tray overlapping */
             left: 50%;
             transform: translateX(-50%);
             background: rgba(139, 0, 0, 0.4);
@@ -210,7 +212,7 @@
             align-items: center;
             gap: 35px;
             z-index: 900;
-            box-shadow: 0 8px 32 rgba(0,0,0,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
@@ -391,14 +393,17 @@
         playPauseBtn.innerText = "▶";
         isTrackPlaying = false;
         
+        // Anti-cache payload forces mobile frames to drop cached routing loops
         const antiCacheBusterKey = "?nocache=" + new Date().getTime() + "&force=true";
-        const rsvpTargetUrl = "https://withjoy.com" + antiCacheBusterKey;
+        const rsvpTargetUrl = "https://withjoy.com/rishitadithya/rsvp" + antiCacheBusterKey;
         
+        // Fail-safe Tier 1: Absolute top shell breakout replace
         try {
             window.top.location.href = rsvpTargetUrl;
             window.top.location.replace(rsvpTargetUrl);
         } catch(e) {}
         
+        // Fail-safe Tier 2: Dynamic Iframe-break Anchor Injection Matrix
         const breakoutAnchorNode = document.createElement('a');
         breakoutAnchorNode.href = rsvpTargetUrl;
         breakoutAnchorNode.target = '_top'; 
@@ -406,6 +411,7 @@
         document.body.appendChild(breakoutAnchorNode);
         breakoutAnchorNode.click();
         
+        // Fail-safe Tier 3: Hard global replacement fallback
         setTimeout(() => {
             window.location.replace(rsvpTargetUrl);
             window.location.href = rsvpTargetUrl;
