@@ -45,10 +45,7 @@
             display: flex;
             z-index: 1000;
             cursor: pointer;
-            visibility: visible;
-            opacity: 1;
             background-color: transparent;
-            transition: opacity 0.4s ease 3.5s, visibility 0s linear 4s;
         }
 
         /* Rigid Split Door Windows to force graphics to display */
@@ -81,11 +78,6 @@
         /* Slid Animation Trigger States */
         .temple-gate-overlay.is-open .gate-door-panel.left { transform: translateX(-100%); }
         .temple-gate-overlay.is-open .gate-door-panel.right { transform: translateX(100%); }
-        .temple-gate-overlay.is-open {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
 
         /* Intuitive Moving Arrow Indicator Group */
         .tap-prompt-banner {
@@ -100,12 +92,14 @@
             pointer-events: none;
             text-align: center;
             z-index: 1010;
-            transition: opacity 0.4s ease;
         }
-        .temple-gate-overlay.is-open .tap-prompt-banner { opacity: 0; }
-        .tap-prompt-banner.hide-indicators {
+        
+        /* State configuration to hide arrows completely during auto-replay loops */
+        .temple-gate-overlay.is-open .tap-prompt-banner,
+        .hide-replay-indicators {
             display: none !important;
             opacity: 0 !important;
+            visibility: hidden !important;
         }
 
         /* Animated Arrow Core glides straight up towards the door handle seams */
@@ -138,6 +132,7 @@
             position: relative;
             background: #f6f4ee;
             z-index: 10;
+            transition: opacity 0.3s ease;
         }
         .invitation-page-slide {
             position: absolute;
@@ -261,7 +256,7 @@
     </div>
 
     <!-- MAIN INTERACTIVE SLIDESHOW FRAMES -->
-    <div class="slides-viewport">
+    <div class="slides-viewport" id="slidesViewport">
         
         <!-- PAGE 1: Maapillai Azhaippu Event details -->
         <div class="invitation-page-slide active-slide" id="slide0">
@@ -305,6 +300,7 @@
     const playPauseBtn = document.getElementById('playPauseBtn');
     const indicatorPromptGroup = document.getElementById('indicatorPromptGroup');
     const mediaConsoleHub = document.getElementById('mediaConsoleHub');
+    const slidesViewport = document.getElementById('slidesViewport');
     
     let currentSlideIndex = 0;
     const totalSlidesCount = 3;
@@ -312,12 +308,24 @@
     let autoTransitionTimer = null;
     let replayTimer = null;
 
+    // Direct registration tracking context validation
+    window.addEventListener('DOMContentLoaded', () => {
+        if (slidesViewport) slidesViewport.style.opacity = '1';
+    });
+
     function executeGateOpening() {
         if (replayTimer !== null) {
             clearTimeout(replayTimer);
             replayTimer = null;
         }
         gateOverlay.classList.add('is-open');
+        
+        setTimeout(() => {
+            if(gateOverlay.classList.contains('is-open')) {
+                gateOverlay.style.display = 'none';
+            }
+        }, 3500);
+
         if (mediaConsoleHub) mediaConsoleHub.classList.add('visible-controls');
         if (!isTrackPlaying) startAudioStream();
         startAutoTransitionLoop();
@@ -333,7 +341,7 @@
         
         document.getElementById(`slide${currentSlideIndex}`).classList.add('active-slide');
 
-        // RSVP Slide Lock: Stop the 15-second loop clock instantly upon reaching index 2
+        // RSVP Slide Lock: Stop the loop interval clock upon reaching index 2
         if (currentSlideIndex === 2 && autoTransitionTimer !== null) {
             clearInterval(autoTransitionTimer);
             autoTransitionTimer = null;
@@ -356,45 +364,62 @@
         startAutoTransitionLoop();
     }
 
-    // High-Force State Reset Loop Engine
+    // Programmatic Replay Loop Solution: Resolves door sliding and closing artifacts completely
     function triggerInlineReplayLoop(event) {
         if(event) { event.preventDefault(); event.stopPropagation(); }
         
-        // 1. Instantly kill all active intervals to freeze execution threads
+        // 1. Clear out active clocks and slide the controls console away
         if (autoTransitionTimer !== null) { clearInterval(autoTransitionTimer); autoTransitionTimer = null; }
         if (replayTimer !== null) { clearTimeout(replayTimer); replayTimer = null; }
         if (mediaConsoleHub) mediaConsoleHub.classList.remove('visible-controls');
 
-        // 2. Clear slideshow frames and silently preset Slide 0 (Maapillai) behind the doors
+        // 2. Blind the underlying content viewport to prevent any card leak flashing
+        if (slidesViewport) {
+            slidesViewport.style.opacity = '0';
+        }
+
+        // 3. Snap doors shut instantly via hardware display block toggles bypassing CSS queues
+        gateOverlay.style.transition = 'none';
+        gateOverlay.classList.remove('is-open');
+        gateOverlay.style.display = 'flex';
+        
+        // Hide arrow prompts permanently for this loop
+        if (indicatorPromptGroup) {
+            indicatorPromptGroup.classList.add('hide-replay-indicators');
+        }
+        
+        // Force immediate browser rendering thread layout recalculation
+        void gateOverlay.offsetWidth; 
+        
+        // Restore doors smooth CSS sliding configurations for the auto-split execution step
+        gateOverlay.style.transition = 'opacity 0.4s ease 3.5s';
+
+        // 4. Reset background invitation layers cleanly back to Slide 0 (Maapillai) out of sight
         for (let i = 0; i < totalSlidesCount; i++) {
             document.getElementById(`slide${i}`).classList.remove('active-slide');
         }
         currentSlideIndex = 0;
         document.getElementById('slide0').classList.add('active-slide');
 
-        // 3. Close the doors instantly without a sliding effect and completely strip arrow elements
-        gateOverlay.style.transition = 'none'; 
-        gateOverlay.classList.remove('is-open');
-        if (indicatorPromptGroup) {
-            indicatorPromptGroup.classList.add('hide-indicators');
-        }
-        
-        // Force synchronous DOM layout recalculation to lock closed states
-        void gateOverlay.offsetWidth; 
-        
-        // Restore doors smooth CSS sliding animations for the upcoming automatic split
-        gateOverlay.style.transition = 'opacity 0.4s ease 3.5s, visibility 0s linear 4s';
-
-        // 4. Force audio track back to the exact start (0:00) and loop smoothly
+        // 5. Force audio track back to the exact start (0:00) and keep playing smoothly
         audioTrack.currentTime = 0;
         startAudioStream();
 
-        // 5. Stand closed statically for EXACTLY 5 seconds with music running, then open automatically
+        // 6. Hold the door card closed statically for EXACTLY 5 seconds with background music running
         replayTimer = setTimeout(() => {
+            // Un-blind the underlying viewport content layer just a split-second before opening
+            if (slidesViewport) slidesViewport.style.opacity = '1';
+            
             gateOverlay.classList.add('is-open');
-            if (mediaConsoleHub) {
-                mediaConsoleHub.classList.add('visible-controls');
-            }
+            
+            if (mediaConsoleHub) mediaConsoleHub.classList.add('visible-controls');
+            
+            setTimeout(() => {
+                if(gateOverlay.classList.contains('is-open')) {
+                    gateOverlay.style.display = 'none';
+                }
+            }, 3500);
+
             startAutoTransitionLoop();
         }, 5000);
     }
@@ -408,7 +433,7 @@
         playPauseBtn.innerText = "▶";
         isTrackPlaying = false;
         
-        // Anti-cache payload forces Safari and local proxies to drop cached redirects
+        // Dynamic anti-cache string forces strict network bypass overrides across any mobile handset model
         const antiCacheBusterKey = "?nocache=" + new Date().getTime() + "&force=true";
         const rsvpTargetUrl = "https://withjoy.com" + antiCacheBusterKey;
         
@@ -440,6 +465,7 @@
     function toggleAudioPlayback() {
         if (replayTimer !== null) {
             clearTimeout(replayTimer); replayTimer = null;
+            if (slidesViewport) slidesViewport.style.opacity = '1';
             gateOverlay.classList.add('is-open');
             if (mediaConsoleHub) mediaConsoleHub.classList.add('visible-controls');
             startAutoTransitionLoop();
