@@ -13,7 +13,7 @@
         }
         body, html {
             width: 100%;
-            height: 100dvh; /* Enforces absolute dynamically scaled Safari sizing boundary */
+            height: 100dvh;
             height: 100vh;
             font-family: 'Georgia', serif;
             background-color: #f6f4ee;
@@ -27,7 +27,7 @@
             position: relative;
             width: 100%;
             max-width: 500px;
-            height: 100dvh; /* Locked strictly inside active visible Safari mobile window */
+            height: 100dvh;
             height: 100vh;
             margin: 0 auto;
             overflow: hidden;
@@ -90,7 +90,7 @@
         /* Intuitive Moving Arrow Indicator Group */
         .tap-prompt-banner {
             position: absolute;
-            bottom: 18%; /* Shifted upward to prevent Safari panel clippings */
+            bottom: 18%;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -199,7 +199,7 @@
         /* FLOATING TRANSLUCENT OVERLAY PLAYBACK NAVIGATION CONSOLE BAR */
         .audio-player-controls {
             position: absolute;
-            bottom: 40px; /* Elevated to completely avoid Safari layout tray overlapping */
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(139, 0, 0, 0.4);
@@ -333,6 +333,7 @@
         
         document.getElementById(`slide${currentSlideIndex}`).classList.add('active-slide');
 
+        // RSVP Slide Lock: Stop the 15-second loop clock instantly upon reaching index 2
         if (currentSlideIndex === 2 && autoTransitionTimer !== null) {
             clearInterval(autoTransitionTimer);
             autoTransitionTimer = null;
@@ -355,31 +356,45 @@
         startAutoTransitionLoop();
     }
 
+    // High-Force State Reset Loop Engine
     function triggerInlineReplayLoop(event) {
         if(event) { event.preventDefault(); event.stopPropagation(); }
+        
+        // 1. Instantly kill all active intervals to freeze execution threads
         if (autoTransitionTimer !== null) { clearInterval(autoTransitionTimer); autoTransitionTimer = null; }
         if (replayTimer !== null) { clearTimeout(replayTimer); replayTimer = null; }
         if (mediaConsoleHub) mediaConsoleHub.classList.remove('visible-controls');
 
-        gateOverlay.style.transition = 'none'; 
-        gateOverlay.classList.remove('is-open');
-        void gateOverlay.offsetWidth; 
-        gateOverlay.style.transition = 'opacity 0.4s ease 3.5s, visibility 0s linear 4s';
-
-        if (indicatorPromptGroup) indicatorPromptGroup.classList.add('hide-indicators');
-
+        // 2. Clear slideshow frames and silently preset Slide 0 (Maapillai) behind the doors
         for (let i = 0; i < totalSlidesCount; i++) {
             document.getElementById(`slide${i}`).classList.remove('active-slide');
         }
         currentSlideIndex = 0;
         document.getElementById('slide0').classList.add('active-slide');
 
+        // 3. Close the doors instantly without a sliding effect and completely strip arrow elements
+        gateOverlay.style.transition = 'none'; 
+        gateOverlay.classList.remove('is-open');
+        if (indicatorPromptGroup) {
+            indicatorPromptGroup.classList.add('hide-indicators');
+        }
+        
+        // Force synchronous DOM layout recalculation to lock closed states
+        void gateOverlay.offsetWidth; 
+        
+        // Restore doors smooth CSS sliding animations for the upcoming automatic split
+        gateOverlay.style.transition = 'opacity 0.4s ease 3.5s, visibility 0s linear 4s';
+
+        // 4. Force audio track back to the exact start (0:00) and loop smoothly
         audioTrack.currentTime = 0;
         startAudioStream();
 
+        // 5. Stand closed statically for EXACTLY 5 seconds with music running, then open automatically
         replayTimer = setTimeout(() => {
             gateOverlay.classList.add('is-open');
-            if (mediaConsoleHub) mediaConsoleHub.classList.add('visible-controls');
+            if (mediaConsoleHub) {
+                mediaConsoleHub.classList.add('visible-controls');
+            }
             startAutoTransitionLoop();
         }, 5000);
     }
@@ -393,17 +408,15 @@
         playPauseBtn.innerText = "▶";
         isTrackPlaying = false;
         
-        // Anti-cache payload forces mobile frames to drop cached routing loops
+        // Anti-cache payload forces Safari and local proxies to drop cached redirects
         const antiCacheBusterKey = "?nocache=" + new Date().getTime() + "&force=true";
-        const rsvpTargetUrl = "https://withjoy.com/rishitadithya/rsvp" + antiCacheBusterKey;
+        const rsvpTargetUrl = "https://withjoy.com" + antiCacheBusterKey;
         
-        // Fail-safe Tier 1: Absolute top shell breakout replace
         try {
             window.top.location.href = rsvpTargetUrl;
             window.top.location.replace(rsvpTargetUrl);
         } catch(e) {}
         
-        // Fail-safe Tier 2: Dynamic Iframe-break Anchor Injection Matrix
         const breakoutAnchorNode = document.createElement('a');
         breakoutAnchorNode.href = rsvpTargetUrl;
         breakoutAnchorNode.target = '_top'; 
@@ -411,7 +424,6 @@
         document.body.appendChild(breakoutAnchorNode);
         breakoutAnchorNode.click();
         
-        // Fail-safe Tier 3: Hard global replacement fallback
         setTimeout(() => {
             window.location.replace(rsvpTargetUrl);
             window.location.href = rsvpTargetUrl;
