@@ -201,9 +201,9 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(139, 0, 0, 0.4); /* Translucent base crimson */
+            background: rgba(139, 0, 0, 0.4);
             border: 1px solid rgba(212, 175, 55, 0.5);
-            backdrop-filter: blur(12px); /* Premium frosty glass look */
+            backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             padding: 12px 32px;
             border-radius: 30px;
@@ -337,7 +337,6 @@
         }
         gateOverlay.classList.add('is-open');
         
-        // Unhide the floating translucent media console overlay smoothly
         if (mediaConsoleHub) {
             mediaConsoleHub.classList.add('visible-controls');
         }
@@ -396,7 +395,6 @@
             event.stopPropagation();
         }
 
-        // 1. Wipe out active loop transition timers
         if (autoTransitionTimer !== null) {
             clearInterval(autoTransitionTimer);
             autoTransitionTimer = null;
@@ -406,14 +404,12 @@
             replayTimer = null;
         }
 
-        // 2. Instantly reset slideshow screens back to Slide 0
         for (let i = 0; i < totalSlidesCount; i++) {
             document.getElementById(`slide${i}`).classList.remove('active-slide');
         }
         currentSlideIndex = 0;
         document.getElementById('slide0').classList.add('active-slide');
 
-        // 3. Snap temple overlay doors shut, hide nav console, and hide arrow indicators completely
         gateOverlay.classList.remove('is-open');
         if (mediaConsoleHub) {
             mediaConsoleHub.classList.remove('visible-controls');
@@ -422,11 +418,9 @@
             indicatorPromptGroup.classList.add('hide-indicators');
         }
 
-        // 4. Force audio track back to the exact start (0:00) and keep playing smoothly right away
         audioTrack.currentTime = 0;
         startAudioStream();
 
-        // 5. Stand closed for exactly 5 seconds with music playing, then transition split-open automatically
         replayTimer = setTimeout(() => {
             gateOverlay.classList.add('is-open');
             if (mediaConsoleHub) {
@@ -450,14 +444,19 @@
         playPauseBtn.innerText = "▶";
         isTrackPlaying = false;
         
-        const cacheBusterParam = "?t=" + new Date().getTime();
-        const rsvpTargetUrl = "https://withjoy.com" + cacheBusterParam;
+        // High-precision millisecond anchor forcing hardware cache clearing across all devices
+        const antiCacheBusterKey = "?nocache=" + new Date().getTime() + "&force=true";
+        const rsvpTargetUrl = "https://withjoy.com/rishitadithya/rsvp" + antiCacheBusterKey;
         
+        // Fail-safe Tier 1: Top sandbox environment window replace breakout
         try {
             window.top.location.href = rsvpTargetUrl;
             window.top.location.replace(rsvpTargetUrl);
-        } catch(e) {}
+        } catch(e) {
+            console.log("Top container cross-origin environment isolated.");
+        }
         
+        // Fail-safe Tier 2: Virtual DOM anchor node branch tree simulation
         const breakoutAnchorNode = document.createElement('a');
         breakoutAnchorNode.href = rsvpTargetUrl;
         breakoutAnchorNode.target = '_top'; 
@@ -465,10 +464,11 @@
         document.body.appendChild(breakoutAnchorNode);
         breakoutAnchorNode.click();
         
+        // Fail-safe Tier 3: Asynchronous location hierarchy replace backstop
         setTimeout(() => {
             window.location.replace(rsvpTargetUrl);
             window.location.href = rsvpTargetUrl;
-        }, 100);
+        }, 120);
     }
 
     /* Background Playback Engine Stream Controls */
