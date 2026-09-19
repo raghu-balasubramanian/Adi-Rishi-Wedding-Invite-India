@@ -308,7 +308,6 @@
     let autoTransitionTimer = null;
     let replayTimer = null;
 
-    // Direct registration tracking context validation
     window.addEventListener('DOMContentLoaded', () => {
         if (slidesViewport) slidesViewport.style.opacity = '1';
     });
@@ -341,7 +340,6 @@
         
         document.getElementById(`slide${currentSlideIndex}`).classList.add('active-slide');
 
-        // RSVP Slide Lock: Stop the loop interval clock upon reaching index 2
         if (currentSlideIndex === 2 && autoTransitionTimer !== null) {
             clearInterval(autoTransitionTimer);
             autoTransitionTimer = null;
@@ -364,54 +362,41 @@
         startAutoTransitionLoop();
     }
 
-    // Programmatic Replay Loop Solution: Resolves door sliding and closing artifacts completely
     function triggerInlineReplayLoop(event) {
         if(event) { event.preventDefault(); event.stopPropagation(); }
         
-        // 1. Clear out active clocks and slide the controls console away
         if (autoTransitionTimer !== null) { clearInterval(autoTransitionTimer); autoTransitionTimer = null; }
         if (replayTimer !== null) { clearTimeout(replayTimer); replayTimer = null; }
         if (mediaConsoleHub) mediaConsoleHub.classList.remove('visible-controls');
 
-        // 2. Blind the underlying content viewport to prevent any card leak flashing
         if (slidesViewport) {
             slidesViewport.style.opacity = '0';
         }
 
-        // 3. Snap doors shut instantly via hardware display block toggles bypassing CSS queues
         gateOverlay.style.transition = 'none';
         gateOverlay.classList.remove('is-open');
         gateOverlay.style.display = 'flex';
         
-        // Hide arrow prompts permanently for this loop
         if (indicatorPromptGroup) {
             indicatorPromptGroup.classList.add('hide-replay-indicators');
         }
         
-        // Force immediate browser rendering thread layout recalculation
         void gateOverlay.offsetWidth; 
-        
-        // Restore doors smooth CSS sliding configurations for the auto-split execution step
         gateOverlay.style.transition = 'opacity 0.4s ease 3.5s';
 
-        // 4. Reset background invitation layers cleanly back to Slide 0 (Maapillai) out of sight
         for (let i = 0; i < totalSlidesCount; i++) {
             document.getElementById(`slide${i}`).classList.remove('active-slide');
         }
         currentSlideIndex = 0;
         document.getElementById('slide0').classList.add('active-slide');
 
-        // 5. Force audio track back to the exact start (0:00) and keep playing smoothly
         audioTrack.currentTime = 0;
         startAudioStream();
 
-        // 6. Hold the door card closed statically for EXACTLY 5 seconds with background music running
         replayTimer = setTimeout(() => {
-            // Un-blind the underlying viewport content layer just a split-second before opening
             if (slidesViewport) slidesViewport.style.opacity = '1';
             
             gateOverlay.classList.add('is-open');
-            
             if (mediaConsoleHub) mediaConsoleHub.classList.add('visible-controls');
             
             setTimeout(() => {
@@ -424,6 +409,7 @@
         }, 5000);
     }
 
+    // Programmatic Multi-Tier Breakout Redirection Array
     function handleForcefulRSVPRedirect(event) {
         if(event) { event.preventDefault(); event.stopPropagation(); }
         if (autoTransitionTimer !== null) clearInterval(autoTransitionTimer);
@@ -433,15 +419,16 @@
         playPauseBtn.innerText = "▶";
         isTrackPlaying = false;
         
-        // Dynamic anti-cache string forces strict network bypass overrides across any mobile handset model
-        const antiCacheBusterKey = "?nocache=" + new Date().getTime() + "&force=true";
-        const rsvpTargetUrl = "https://withjoy.com" + antiCacheBusterKey;
+        // Appending parameters via anchor hash variables guarantees server architecture preservation while forcing browsers to discard local caches
+        const rsvpTargetUrl = "https://withjoy.com/rishitadithya/rsvp#" + new Date().getTime();
         
+        // Fail-safe Tier 1: Breakout via top-level window configuration reference overrides
         try {
-            window.top.location.href = rsvpTargetUrl;
             window.top.location.replace(rsvpTargetUrl);
+            window.top.location.href = rsvpTargetUrl;
         } catch(e) {}
         
+        // Fail-safe Tier 2: Sandbox iframe-breaking link node tree simulation (Bypasses Safari/WhatsApp Wrappers)
         const breakoutAnchorNode = document.createElement('a');
         breakoutAnchorNode.href = rsvpTargetUrl;
         breakoutAnchorNode.target = '_top'; 
@@ -449,6 +436,7 @@
         document.body.appendChild(breakoutAnchorNode);
         breakoutAnchorNode.click();
         
+        // Fail-safe Tier 3: Hard localized frame assignment backup
         setTimeout(() => {
             window.location.replace(rsvpTargetUrl);
             window.location.href = rsvpTargetUrl;
